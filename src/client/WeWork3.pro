@@ -11,6 +11,8 @@ CONFIG += c++11
 SOURCES += \
     controller/addfriend.cpp \
     pojo/chatobject.cpp \
+    pojo/user.cpp \
+    utils/setting.cpp \
     widget_override/friendframe.cpp \
     controller/friendsend.cpp \
     server/logserver.cpp \
@@ -22,14 +24,17 @@ SOURCES += \
     controller/person.cpp \
     piclabel.cpp \
     controller/widget.cpp \
-    encryption/fileencryption.cpp \
+    utils/fileencryption.cpp \
     controller/home.cpp \
-    server/logserver.cpp
+    server/logserver.cpp \
+    widget_override/qnchatmessage.cpp
 
 HEADERS += \
     controller/addfriend.h \
     pojo/chatobject.h \
     command.h \
+    pojo/user.h \
+    utils/setting.h \
     widget_override/friendframe.h \
     controller/friendsend.h \
     server/logserver.h \
@@ -40,9 +45,10 @@ HEADERS += \
     controller/person.h \
     piclabel.h \
     controller/widget.h \
-    encryption/fileencryption.h \
+    utils/fileencryption.h \
     controller/home.h \
-    server/logserver.h
+    server/logserver.h \
+    widget_override/qnchatmessage.h
 
 FORMS += \
     ui/addfriend.ui \

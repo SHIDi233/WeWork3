@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "utils/setting.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -10,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->tabWidget->setTabText(0, "登录");
     ui->tabWidget->setTabText(1, "注册");
+
+    setting::init();
 
 }
 
@@ -29,6 +32,7 @@ chatObject *MainWindow::log(QString ID, QString pw) {
 
 
 }
+
 
 void MainWindow::on_log_button_clicked()
 {
