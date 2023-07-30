@@ -64,7 +64,7 @@ public:
     {
         if (logWindow->objectName().isEmpty())
             logWindow->setObjectName(QString::fromUtf8("logWindow"));
-        logWindow->resize(910, 640);
+        logWindow->resize(918, 640);
         frame = new QFrame(logWindow);
         frame->setObjectName(QString::fromUtf8("frame"));
         frame->setGeometry(QRect(0, 0, 61, 641));
