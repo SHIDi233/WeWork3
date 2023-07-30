@@ -11,9 +11,9 @@ public:
     void setName(QString name);
     void setToken(QString token);
     void setHead(QString head);
-    void setNumber(QString number);
+    void setID(int ID);
     QString getName();
-    QString getNumber();
+    int getID();
     QString getToken();
     QString getHead();
 
@@ -27,7 +27,7 @@ private:
     const User &operator=(const User&);
 
     QString _name; //用户名
-    QString _number; //账号
+    int _ID; //账号
     QString _token; //令牌
     QString _head; //头像url
 

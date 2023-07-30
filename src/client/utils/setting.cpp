@@ -20,3 +20,23 @@ QString setting::getGlobalPath() {
     QSettings *settings = new QSettings("setting.ini",QSettings::IniFormat);
     return settings->value("global/path").toString();
 }
+
+void setting::setKey(QString key) {
+    QSettings *settings = new QSettings("setting.ini",QSettings::IniFormat);
+    settings->setValue("key/AesKey", key);
+}
+
+QString setting::getKey() {
+    QSettings *settings = new QSettings("setting.ini",QSettings::IniFormat);
+    return settings->value("key/AesKey").toString();
+}
+
+void setting::setIv(QString iv) {
+    QSettings *settings = new QSettings("setting.ini",QSettings::IniFormat);
+    settings->setValue("key/iv", iv);
+}
+
+QString setting::getIv() {
+    QSettings *settings = new QSettings("setting.ini",QSettings::IniFormat);
+    return settings->value("key/iv").toString();
+}

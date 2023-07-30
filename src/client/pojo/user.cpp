@@ -18,16 +18,16 @@ void User::setHead(QString head) {
     _head = head;
 }
 
-void User::setNumber(QString number) {
-    _number = number;
+void User::setID(int ID) {
+    _ID = ID;
 }
 
 QString User::getName() {
     return _name;
 }
 
-QString User::getNumber() {
-    return _number;
+int User::getID() {
+    return _ID;
 }
 
 QString User::getToken() {
