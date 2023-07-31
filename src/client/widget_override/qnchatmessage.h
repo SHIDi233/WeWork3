@@ -13,6 +13,7 @@
 #define QNCHATMESSAGE_H
 
 #include <QWidget>
+#include "piclabel.h"
 
 class QPaintEvent;
 class QPainter;
@@ -41,10 +42,11 @@ public:
 
     void setTextSuccess();
     void setText(QString text, QString time, QSize allSize, User_Type userType);
-//    void setPic(QString path, User_Type userType);
+    void setPic(QString path, QString time, QSize allSize, User_Type userType);
 
     QSize getRealString(QString src);
     QSize fontRect(QString str);
+    QSize fontRectPic(QString path);
 
     inline QString text() {return m_msg;}
     inline QString time() {return m_time;}
@@ -76,6 +78,8 @@ private:
     QPixmap m_leftPixmap;
     QPixmap m_rightPixmap;
     QPixmap pic;
+    PicLabel *picLabel;
+    int widthOfPic;
     QLabel* m_loading = Q_NULLPTR;
     QMovie* m_loadingMovie = Q_NULLPTR;
     bool m_isSending = false;

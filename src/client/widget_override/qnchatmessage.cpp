@@ -69,6 +69,26 @@ void QNChatMessage::setText(QString text, QString time, QSize allSize, QNChatMes
     this->update();
 }
 
+void QNChatMessage::setPic(QString path, QString time, QSize allSize, QNChatMessage::User_Type userType)
+{
+//    m_msg = text;
+    m_userType = userType;
+    m_time = time;
+    m_curTime = QDateTime::fromTime_t(time.toInt()).toString("hh:mm");
+    m_allSize = allSize;
+    if(userType == User_Me) {
+        if(!m_isSending) {
+            m_loading->move(m_kuangRightRect.x() - m_loading->width() - 10, m_kuangRightRect.y()+m_kuangRightRect.height()/2- m_loading->height()/2);
+            m_loading->show();
+            m_loadingMovie->start();
+        }
+    } else {
+        m_loading->hide();
+    }
+
+    this->update();
+}
+
 QSize QNChatMessage::fontRect(QString str)
 {
     m_msg = str;
@@ -108,6 +128,43 @@ QSize QNChatMessage::fontRect(QString str)
                             m_kuangRightRect.width()-2*textSpaceRect,m_kuangRightRect.height()-2*iconTMPH);
 
     return QSize(size.width(), hei);
+}
+
+QSize QNChatMessage::fontRectPic(QString path)
+{
+//    m_msg = str;
+    int minHei = 30;
+    int iconWH = 40;
+    int iconSpaceW = 20;
+    int iconRectW = 5;
+    int iconTMPH = 10;
+    int sanJiaoW = 6;
+    int kuangTMP = 20;
+    int textSpaceRect = 12;
+    m_kuangWidth = this->width() - kuangTMP - 2*(iconWH+iconSpaceW+iconRectW);
+    m_textWidth = m_kuangWidth - 2*textSpaceRect;
+    m_spaceWid = this->width() - m_textWidth;
+    m_iconLeftRect = QRect(iconSpaceW, iconTMPH, iconWH, iconWH);
+    m_iconRightRect = QRect(this->width() - iconSpaceW - iconWH, iconTMPH, iconWH, iconWH);
+
+//    QSize size = getRealString(m_msg); // 整个的size
+    m_chatType = Chat_Pic;
+
+    QPixmap pixmap(path);
+    //让图像大小合适
+    if(pixmap.width() > 150 || pixmap.height() > 150) {
+        pixmap = pixmap.scaled(QSize(150, 150), Qt::KeepAspectRatio);
+    }
+    picLabel = new PicLabel(this, path);
+    picLabel->setPixmap(pixmap);
+    QSize size = pixmap.size();
+    widthOfPic = pixmap.width();
+    picLabel->setVisible(false);
+
+    qDebug() << "fontRect Size:" << size;
+    int hei = size.height() < minHei ? minHei : size.height();
+
+    return QSize(size.width(), hei + 30);
 }
 
 QSize QNChatMessage::getRealString(QString src)
@@ -206,6 +263,14 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         //头像
 //        painter.drawRoundedRect(m_iconRightRect,m_iconRightRect.width(),m_iconRightRect.height());
         painter.drawPixmap(m_iconRightRect, m_rightPixmap);
+        qDebug() << m_iconRightRect.topLeft().rx() << ", " << m_iconRightRect.topLeft().ry();
+        if(m_chatType == Chat_Pic) {
+            picLabel->move(m_iconRightRect.topLeft().rx() - widthOfPic - 20, m_iconRightRect.topLeft().ry());
+            qDebug() << m_iconRightRect.topLeft().rx() - widthOfPic - 20 << ", " << m_iconRightRect.topLeft().ry();
+            picLabel->setVisible(true);
+            return;
+        }
+//        return;
 
         //框
         QColor col_Kuang(75,164,242);

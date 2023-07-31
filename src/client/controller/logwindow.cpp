@@ -100,7 +100,7 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 
     }
     if(chats.size() <= 8) {
-        fLayout->addSpacerItem(new QSpacerItem(20, 17 + (8 - chats.size()) * 70, QSizePolicy::Expanding));
+        fLayout->addSpacerItem(new QSpacerItem(20, 9 + (9 - chats.size()) * 70, QSizePolicy::Expanding));
     }
     //设置点击事件
     for(int i = 0; i < friends.size(); i++) {
@@ -229,7 +229,7 @@ void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Ty
     chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
 }
 
-void logWindow::setPic(QString msg, int ID, QString name, QNChatMessage::User_Type type) {
+void logWindow::setPic(QString path, int ID, QString name, QNChatMessage::User_Type type) {
 
     int index = -1;
     //寻找消息发送对象
@@ -250,12 +250,12 @@ void logWindow::setPic(QString msg, int ID, QString name, QNChatMessage::User_Ty
 
         QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
-        dealMessage(messageW, item, msg, time, type);
+        dealPic(messageW, item, path, time, type);
     } else {
         bool isOver = true;
         for(int i = chat_lists[index]->count() - 1; i > 0; i--) {
             QNChatMessage* messageW = (QNChatMessage*)chat_lists[index]->itemWidget(chat_lists[index]->item(i));
-            if(messageW->text() == msg) {
+            if(messageW->text() == path) {
                 isOver = false;
                 messageW->setTextSuccess();
             }
@@ -265,7 +265,7 @@ void logWindow::setPic(QString msg, int ID, QString name, QNChatMessage::User_Ty
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
-            dealMessage(messageW, item, msg, time, type);
+            dealPic(messageW, item, path, time, type);
             messageW->setTextSuccess();
         }
     }
@@ -280,6 +280,19 @@ void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QStr
 
 //    item->setSizeHint(QSize(5, 100));
     messageW->setText(text, time, size, type);
+    messageW->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
+//    item->setSizeHint()
+    chat_lists[cur_index]->setItemWidget(item, messageW);
+}
+
+void logWindow::dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time,  QNChatMessage::User_Type type)
+{
+    messageW->setFixedWidth(ui->chat_stack_widget->width() - 4);
+    QSize size = messageW->fontRectPic(path);
+    item->setSizeHint(size);
+
+//    item->setSizeHint(QSize(5, 100));
+    messageW->setPic(path, time, size, type);
     messageW->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
 //    item->setSizeHint()
     chat_lists[cur_index]->setItemWidget(item, messageW);
@@ -338,16 +351,16 @@ void logWindow::on_pic_send_clicked()
 
     QString picPath = QFileDialog::getOpenFileName(this, tr("选择要发送的图片"), "/", tr("图片文件 (*.jpg *.png *.bmg *.jpeg)"));
 
-    QHBoxLayout *pHboxLayout = new QHBoxLayout();
-    MeSend *meSend = new MeSend(ui->chat_stack_widget->widget(cur_index + 2), picPath, me->getHead(), me->getName(), F_TYPE::fPic);
-    pHboxLayout->insertStretch(0);
-    pHboxLayout->addWidget(meSend);
-    //m_pVboxLayout->addLayout(pHboxLayout);
-    chat_layouts[cur_index]->addLayout(pHboxLayout);
+//    QHBoxLayout *pHboxLayout = new QHBoxLayout();
+//    MeSend *meSend = new MeSend(ui->chat_stack_widget->widget(cur_index + 2), picPath, me->getHead(), me->getName(), F_TYPE::fPic);
+//    pHboxLayout->insertStretch(0);
+//    pHboxLayout->addWidget(meSend);
+//    //m_pVboxLayout->addLayout(pHboxLayout);
+//    chat_layouts[cur_index]->addLayout(pHboxLayout);
 
-    //receivePic(picPath, 123, "童雪");
-    //通过网络发送图片(picPath路径的图片)****************************
-
+//    //receivePic(picPath, 123, "童雪");
+//    //通过网络发送图片(picPath路径的图片)****************************
+    setPic(picPath, chats[cur_index]->getID(), chats[cur_index]->getName(), QNChatMessage::User_Me);
 
 
 
