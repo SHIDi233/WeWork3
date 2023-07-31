@@ -15,7 +15,6 @@ void setting::init()
 }
 
 QString setting::getGlobalPath() {
-
     init();
     QSettings *settings = new QSettings("setting.ini",QSettings::IniFormat);
     return settings->value("global/path").toString();
