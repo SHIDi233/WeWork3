@@ -8,6 +8,6 @@
  *          0: 账号或密码错误
  *          1: 登录成功
  */
-int LogServer::log(QString num, QString password) {
-    return 1;
-}
+//int LogServer::log(QString num, QString password) {
+//    return 1;
+//}
