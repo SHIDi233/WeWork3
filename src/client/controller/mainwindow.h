@@ -7,6 +7,7 @@
 
 #include <QMainWindow>
 #include "logwindow.h"
+#include <QGraphicsDropShadowEffect>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,10 @@ private slots:
     void on_log_button_clicked();
 
     void on_reg_button_clicked();
+
+    void on_minus_buton_clicked();
+
+    void on_quit_button_clicked();
 
 private:
     Ui::MainWindow *ui;

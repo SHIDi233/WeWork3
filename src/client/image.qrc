@@ -6,6 +6,8 @@
         <file>image/background-pyq.png</file>
         <file>image/file_icon.png</file>
         <file>image/background-call.png</file>
+        <file>image/login_background.png</file>
+        <file>image/login_background2.png</file>
     </qresource>
     <qresource prefix="/new/head">
         <file>image/head_1.png</file>
@@ -20,6 +22,10 @@
         <file>image/pyq_icon.png</file>
         <file>image/item_icon.png</file>
         <file>image/set_icon.png</file>
+        <file>image/account_icon.png</file>
+        <file>image/password_icon.png</file>
+        <file>image/quit_icon.png</file>
+        <file>image/shrink_icon.png</file>
     </qresource>
     <qresource prefix="/">
         <file>img/Customer Copy.png</file>

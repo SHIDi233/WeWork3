@@ -56,7 +56,6 @@ public:
         font.setFamily(QString::fromUtf8("\345\256\213\344\275\223"));
         font.setPointSize(11);
         font.setBold(false);
-        font.setWeight(50);
         label->setFont(font);
         lineEdit = new QLineEdit(search_tab);
         lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
