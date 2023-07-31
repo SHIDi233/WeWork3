@@ -276,9 +276,9 @@ background-image: url(:/new/bg/image/background-pyq.png);
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>500</y>
+       <y>520</y>
        <width>691</width>
-       <height>151</height>
+       <height>131</height>
       </rect>
      </property>
      <property name="font">
@@ -331,7 +331,7 @@ background-color: rgb(0, 130, 230);
      <property name="geometry">
       <rect>
        <x>290</x>
-       <y>460</y>
+       <y>480</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -360,7 +360,7 @@ background-color: rgb(0, 130, 230);
      <property name="geometry">
       <rect>
        <x>380</x>
-       <y>460</y>
+       <y>480</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -391,7 +391,7 @@ background-color: rgb(0, 130, 230);
        <x>250</x>
        <y>60</y>
        <width>731</width>
-       <height>381</height>
+       <height>411</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -492,7 +492,7 @@ background-color: rgb(85, 170, 255);
      <property name="geometry">
       <rect>
        <x>470</x>
-       <y>460</y>
+       <y>480</y>
        <width>71</width>
        <height>31</height>
       </rect>
