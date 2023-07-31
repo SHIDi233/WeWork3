@@ -49,16 +49,16 @@ chatObject *MainWindow::log(QString ID, QString pw) {
 
 void MainWindow::on_log_button_clicked()
 {
-//    QString ID = ui->log_id_line->text();
-//    if(ID.isEmpty()) {
-//        ui->hint_1->setText("请输入账号！");
-//        return;
-//    }
-//    QString pw = ui->log_pass_line->text();
-//    if(pw.isEmpty()) {
-//        ui->hint_1->setText("请输入密码！");
-//        return;
-//    }
+    QString ID = ui->log_id_line->text();
+    if(ID.isEmpty()) {
+        ui->hint_1->setText("请输入账号！");
+        return;
+    }
+    QString pw = ui->log_pass_line->text();
+    if(pw.isEmpty()) {
+        ui->hint_1->setText("请输入密码！");
+        return;
+    }
 
     //测试数据
     chatObject *p = new chatObject("Apple", 0, 111, TYPE::Me);
