@@ -31,8 +31,17 @@ public:
         User_She,   //用户
         User_Time,  //时间
     };
+
+    enum Chat_Type{
+        Chat_Msg,  //文字消息
+        Chat_Pic,  //图片
+        Chat_Video,//视频
+        Chat_File  //文件
+    };
+
     void setTextSuccess();
     void setText(QString text, QString time, QSize allSize, User_Type userType);
+//    void setPic(QString path, User_Type userType);
 
     QSize getRealString(QString src);
     QSize fontRect(QString str);
@@ -49,6 +58,7 @@ private:
 
     QSize m_allSize;
     User_Type m_userType = User_System;
+    Chat_Type m_chatType;
 
     int m_kuangWidth;
     int m_textWidth;
@@ -65,6 +75,7 @@ private:
     QRect m_textRightRect;
     QPixmap m_leftPixmap;
     QPixmap m_rightPixmap;
+    QPixmap pic;
     QLabel* m_loading = Q_NULLPTR;
     QMovie* m_loadingMovie = Q_NULLPTR;
     bool m_isSending = false;

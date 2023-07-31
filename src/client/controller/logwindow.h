@@ -31,6 +31,8 @@ public:
     bool getCall(int ID, int type);//调出电话界面，type=0表示视频电话，type=1表示语音通话
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime);
+    void setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type);
+    void setPic(QString path, int ID, QString name, QNChatMessage::User_Type type);
 protected:
     void resizeEvent(QResizeEvent *event);
 private:

@@ -170,47 +170,106 @@ void logWindow::on_send_button_clicked()
 
 
     QString msg = ui->texteditInput->toPlainText();
+    if(msg == "") { return; }
     ui->texteditInput->clear();
+    setMsg(msg, chats[cur_index]->getID(), chats[cur_index]->getName(), QNChatMessage::User_Me);
+
+
+//    } else {
+//        if(msg != "") {
+//            dealMessageTime(time);
+
+//            QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
+//            QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
+//            dealMessage(messageW, item, msg, time, QNChatMessage::User_She);
+//        }
+//    }
+}
+
+void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type) {
+
+    int index = -1;
+    //寻找消息发送对象
+    for(int i = 0; i < chats.size(); i++) {
+        if(chats[i]->getID() == ID) {
+            index = i;
+            break;
+        }
+    }
+    if(index == -1) { return; }
+
+    bool isSending = false; // 发送中
     QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
 
-    bool isSending = true; // 发送中
-
     qDebug()<<"addMessage" << msg << time << chat_lists[cur_index]->count();
-    if(chat_lists[cur_index]->count()%2) {
-        if(isSending) {
-            dealMessageTime(time);
+    if(isSending) {
+        dealMessageTime(time);
 
-            QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
-            QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
-            dealMessage(messageW, item, msg, time, QNChatMessage::User_Me);
-        } else {
-            bool isOver = true;
-            for(int i = chat_lists[cur_index]->count() - 1; i > 0; i--) {
-                QNChatMessage* messageW = (QNChatMessage*)chat_lists[cur_index]->itemWidget(chat_lists[cur_index]->item(i));
-                if(messageW->text() == msg) {
-                    isOver = false;
-                    messageW->setTextSuccess();
-                }
-            }
-            if(isOver) {
-                dealMessageTime(time);
-
-                QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
-                QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
-                dealMessage(messageW, item, msg, time, QNChatMessage::User_Me);
+        QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
+        QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
+        dealMessage(messageW, item, msg, time, type);
+    } else {
+        bool isOver = true;
+        for(int i = chat_lists[index]->count() - 1; i > 0; i--) {
+            QNChatMessage* messageW = (QNChatMessage*)chat_lists[index]->itemWidget(chat_lists[index]->item(i));
+            if(messageW->text() == msg) {
+                isOver = false;
                 messageW->setTextSuccess();
             }
         }
-    } else {
-        if(msg != "") {
+        if(isOver) {
             dealMessageTime(time);
 
-            QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
-            QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
-            dealMessage(messageW, item, msg, time, QNChatMessage::User_She);
+            QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
+            QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
+            dealMessage(messageW, item, msg, time, type);
+            messageW->setTextSuccess();
         }
     }
-    chat_lists[cur_index]->setCurrentRow(chat_lists[cur_index]->count()-1);
+    chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
+}
+
+void logWindow::setPic(QString msg, int ID, QString name, QNChatMessage::User_Type type) {
+
+    int index = -1;
+    //寻找消息发送对象
+    for(int i = 0; i < chats.size(); i++) {
+        if(chats[i]->getID() == ID) {
+            index = i;
+            break;
+        }
+    }
+    if(index == -1) { return; }
+
+    bool isSending = false; // 发送中
+    QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
+
+//    qDebug()<<"addMessage" << msg << time << chat_lists[cur_index]->count();
+    if(isSending) {
+        dealMessageTime(time);
+
+        QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
+        QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
+        dealMessage(messageW, item, msg, time, type);
+    } else {
+        bool isOver = true;
+        for(int i = chat_lists[index]->count() - 1; i > 0; i--) {
+            QNChatMessage* messageW = (QNChatMessage*)chat_lists[index]->itemWidget(chat_lists[index]->item(i));
+            if(messageW->text() == msg) {
+                isOver = false;
+                messageW->setTextSuccess();
+            }
+        }
+        if(isOver) {
+            dealMessageTime(time);
+
+            QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
+            QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
+            dealMessage(messageW, item, msg, time, type);
+            messageW->setTextSuccess();
+        }
+    }
+    chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
 }
 
 void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)
@@ -235,7 +294,7 @@ void logWindow::dealMessageTime(QString curMsgTime)
         int lastTime = messageW->time().toInt();
         int curTime = curMsgTime.toInt();
         qDebug() << "curTime lastTime:" << curTime - lastTime;
-        isShowTime = ((curTime - lastTime) > 60); // 两个消息相差一分钟
+        isShowTime = ((curTime - lastTime) > 180); // 两个消息相差一分钟
 //        isShowTime = true;
     } else {
         isShowTime = true;
