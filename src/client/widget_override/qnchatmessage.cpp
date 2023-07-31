@@ -38,6 +38,8 @@ QNChatMessage::QNChatMessage(QWidget *parent) : QWidget(parent)
     m_loading->resize(16,16);
     m_loading->setAttribute(Qt::WA_TranslucentBackground , true);
     m_loading->setAutoFillBackground(false);
+
+
 }
 
 void QNChatMessage::setTextSuccess()
@@ -229,6 +231,13 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
         painter.setFont(this->font());
         painter.drawText(m_textRightRect,m_msg,option);
+
+//        QLabel *q = new QLabel(this);
+//        q->resize(60, 60);
+//        q->setPixmap(m_leftPixmap);
+//        q->move(m_textRightRect.topLeft());
+//        q->setVisible(true);
+
     }  else if(m_userType == User_Type::User_Time) { // 时间
         QPen penText;
         penText.setColor(QColor(153,153,153));
