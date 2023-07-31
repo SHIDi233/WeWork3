@@ -170,7 +170,7 @@ QLineEdit:focus{
     <property name="geometry">
      <rect>
       <x>520</x>
-      <y>350</y>
+      <y>370</y>
       <width>191</width>
       <height>31</height>
      </rect>
@@ -317,6 +317,22 @@ QPushButton::disabled{
      </size>
     </property>
    </widget>
+   <widget class="QLabel" name="hint_1">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>330</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 0, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>label_2</zorder>
    <zorder>label_3</zorder>
    <zorder>log_id_line</zorder>
@@ -327,6 +343,7 @@ QPushButton::disabled{
    <zorder>password_icon</zorder>
    <zorder>minus_buton</zorder>
    <zorder>quit_button</zorder>
+   <zorder>hint_1</zorder>
   </widget>
  </widget>
  <resources>
