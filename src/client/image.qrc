@@ -21,4 +21,9 @@
         <file>image/item_icon.png</file>
         <file>image/set_icon.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>img/Customer Copy.png</file>
+        <file>img/CustomerService.png</file>
+        <file>img/loading4.gif</file>
+    </qresource>
 </RCC>

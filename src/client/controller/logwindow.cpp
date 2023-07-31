@@ -85,6 +85,9 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
         chat_area->setLayout(chat_area_layout);
         chat_area->show();
         chat_area->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
+//        chat_area->setLineWidth(ui->chat_stack_widget->width());
+//        chat_area->setGridSize(QSize(ui->chat_stack_widget->width() - 2, ui->chat_stack_widget->height() - 2));
+//        chat_area->setFixedWidth(300);
         chat_area->setAutoScroll(true);
         chat_area->setAutoScrollMargin(16);
 //        chat_area->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
@@ -116,6 +119,13 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     //初始化朋友圈
     pyq = new Widget(me, ui->scrollArea_3);
     pyq->show();
+}
+
+/**
+ * @brief 从本地数据库中获取数据并展示
+ */
+void logWindow::init() {
+
 }
 
 logWindow::~logWindow()
@@ -205,10 +215,14 @@ void logWindow::on_send_button_clicked()
 
 void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)
 {
-    messageW->setFixedWidth(this->width());
+    messageW->setFixedWidth(ui->chat_stack_widget->width() - 4);
     QSize size = messageW->fontRect(text);
     item->setSizeHint(size);
+
+//    item->setSizeHint(QSize(5, 100));
     messageW->setText(text, time, size, type);
+    messageW->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
+//    item->setSizeHint()
     chat_lists[cur_index]->setItemWidget(item, messageW);
 }
 
@@ -230,7 +244,7 @@ void logWindow::dealMessageTime(QString curMsgTime)
         QNChatMessage* messageTime = new QNChatMessage(chat_lists[cur_index]->parentWidget());
         QListWidgetItem* itemTime = new QListWidgetItem(chat_lists[cur_index]);
 
-        QSize size = QSize(this->width(), 40);
+        QSize size = QSize(ui->chat_stack_widget->width() - 4, 40);
         messageTime->resize(size);
         itemTime->setSizeHint(size);
         messageTime->setText(curMsgTime, curMsgTime, size, QNChatMessage::User_Time);

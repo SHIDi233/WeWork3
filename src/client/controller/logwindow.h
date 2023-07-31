@@ -33,6 +33,8 @@ public:
     void dealMessageTime(QString curMsgTime);
 protected:
     void resizeEvent(QResizeEvent *event);
+private:
+    void init();
 private slots:
     void on_send_button_clicked();
 

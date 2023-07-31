@@ -2,13 +2,16 @@
 #define ENCRYPTION_H
 
 #include <iostream>
+#include <openssl/evp.h>
+#include <openssl/aes.h>
+#include <fstream>
 
 namespace Encryption
 {
-    void encryptFileCBC(const std::string& inputFileName, const std::string& outputFileName);
-    void decryptFileCBC(const std::string& inputFileName, const std::string& outputFileName);
-    std::string encryptWords(const std::string& content);
-    std::string dencryptWords(const std::string& content);
+    void encryptFileCBC(const std::string& inputFileName, const std::string& outputFileName, const std::string& keyStr, const std::string& ivStr);
+    void decryptFileCBC(const std::string& inputFileName, const std::string& outputFileName, const std::string& keyStr, const std::string& ivStr);
+    std::string encryptWords(const std::string& plaintext, const std::string& keyStr, const std::string& ivStr);
+    std::string decryptWords(const std::string& ciphertext, const std::string& keyStr, const std::string& ivStr);
 };
 
 #endif // ENCRYPTION_H
