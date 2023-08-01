@@ -43,6 +43,7 @@ public:
     void setTextSuccess();
     void setText(QString text, QString time, QSize allSize, User_Type userType);
     void setPic(QString path, QString time, QSize allSize, User_Type userType);
+    void setName(QString name);
 
     QSize getRealString(QString src);
     QSize fontRect(QString str);
@@ -83,6 +84,8 @@ private:
     QLabel* m_loading = Q_NULLPTR;
     QMovie* m_loadingMovie = Q_NULLPTR;
     bool m_isSending = false;
+    int nameHeight;
+    QLabel* nameLabel = Q_NULLPTR;
 };
 
 #endif // QNCHATMESSAGE_H

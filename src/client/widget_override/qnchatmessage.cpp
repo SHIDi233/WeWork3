@@ -39,7 +39,8 @@ QNChatMessage::QNChatMessage(QWidget *parent) : QWidget(parent)
     m_loading->setAttribute(Qt::WA_TranslucentBackground , true);
     m_loading->setAutoFillBackground(false);
 
-
+    nameHeight = 15;
+    nameLabel = new QLabel(this);
 }
 
 void QNChatMessage::setTextSuccess()
@@ -67,6 +68,10 @@ void QNChatMessage::setText(QString text, QString time, QSize allSize, QNChatMes
     }
 
     this->update();
+}
+
+void QNChatMessage::setName(QString name) {
+    nameLabel->setText(name);
 }
 
 void QNChatMessage::setPic(QString path, QString time, QSize allSize, QNChatMessage::User_Type userType)
@@ -110,6 +115,7 @@ QSize QNChatMessage::fontRect(QString str)
 
     qDebug() << "fontRect Size:" << size;
     int hei = size.height() < minHei ? minHei : size.height();
+//    hei += nameHeight;
 
     m_sanjiaoLeftRect = QRect(iconWH+iconSpaceW+iconRectW, m_lineHeight/2, sanJiaoW, hei - m_lineHeight);
     m_sanjiaoRightRect = QRect(this->width() - iconRectW - iconWH - iconSpaceW - sanJiaoW, m_lineHeight/2, sanJiaoW, hei - m_lineHeight);
@@ -126,6 +132,14 @@ QSize QNChatMessage::fontRect(QString str)
                            m_kuangLeftRect.width()-2*textSpaceRect,m_kuangLeftRect.height()-2*iconTMPH);
     m_textRightRect.setRect(m_kuangRightRect.x()+textSpaceRect,m_kuangRightRect.y()+iconTMPH,
                             m_kuangRightRect.width()-2*textSpaceRect,m_kuangRightRect.height()-2*iconTMPH);
+
+    m_sanjiaoRightRect.moveBottom(m_sanjiaoRightRect.bottom() + nameHeight);
+    m_sanjiaoLeftRect.moveBottom(m_sanjiaoLeftRect.bottom() + nameHeight);
+    m_kuangLeftRect.moveBottom(m_kuangLeftRect.bottom() + nameHeight);
+    m_kuangRightRect.moveBottom(m_kuangRightRect.bottom() + nameHeight);
+    m_textLeftRect.moveBottom(m_textLeftRect.bottom() + nameHeight);
+    m_textRightRect.moveBottom(m_textRightRect.bottom() + nameHeight);
+    hei += nameHeight;
 
     return QSize(size.width(), hei);
 }
@@ -164,7 +178,7 @@ QSize QNChatMessage::fontRectPic(QString path)
     qDebug() << "fontRect Size:" << size;
     int hei = size.height() < minHei ? minHei : size.height();
 
-    return QSize(size.width(), hei + 30);
+    return QSize(size.width(), hei + 30 + nameHeight);
 }
 
 QSize QNChatMessage::getRealString(QString src)
@@ -224,6 +238,19 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
 //        painter.drawRoundedRect(m_iconLeftRect,m_iconLeftRect.width(),m_iconLeftRect.height());
         painter.drawPixmap(m_iconLeftRect, m_leftPixmap);
 
+        //名字
+        nameLabel->adjustSize();
+        nameLabel->move(m_iconLeftRect.topRight().rx() + 20, m_iconRightRect.topLeft().ry());
+        nameLabel->setVisible(true);
+        qDebug() << nameLabel->width() << nameLabel->text();
+
+        if(m_chatType == Chat_Pic) {
+            picLabel->move(m_iconLeftRect.topRight().rx() + 20, m_iconLeftRect.topRight().ry() + nameHeight);
+//            qDebug() << m_iconRightRect.topLeft().rx() - widthOfPic - 20 << ", " << m_iconRightRect.topLeft().ry();
+            picLabel->setVisible(true);
+            return;
+        }
+
         //框加边
         QColor col_KuangB(234, 234, 234);
         painter.setBrush(QBrush(col_KuangB));
@@ -235,9 +262,9 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
 
         //三角
         QPointF points[3] = {
-            QPointF(m_sanjiaoLeftRect.x(), 30),
-            QPointF(m_sanjiaoLeftRect.x()+m_sanjiaoLeftRect.width(), 25),
-            QPointF(m_sanjiaoLeftRect.x()+m_sanjiaoLeftRect.width(), 35),
+            QPointF(m_sanjiaoLeftRect.x(), 30 + nameHeight),
+            QPointF(m_sanjiaoLeftRect.x()+m_sanjiaoLeftRect.width(), 25 + nameHeight),
+            QPointF(m_sanjiaoLeftRect.x()+m_sanjiaoLeftRect.width(), 35 + nameHeight),
         };
         QPen pen;
         pen.setColor(col_Kuang);
@@ -263,10 +290,17 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         //头像
 //        painter.drawRoundedRect(m_iconRightRect,m_iconRightRect.width(),m_iconRightRect.height());
         painter.drawPixmap(m_iconRightRect, m_rightPixmap);
-        qDebug() << m_iconRightRect.topLeft().rx() << ", " << m_iconRightRect.topLeft().ry();
+//        qDebug() << m_iconRightRect.topLeft().rx() << ", " << m_iconRightRect.topLeft().ry();
+
+        //名字
+        nameLabel->adjustSize();
+        nameLabel->move(m_iconRightRect.topLeft().rx() - 20 - nameLabel->width(), m_iconRightRect.topLeft().ry());
+        nameLabel->setVisible(true);
+        qDebug() << nameLabel->width() << nameLabel->text();
+
         if(m_chatType == Chat_Pic) {
-            picLabel->move(m_iconRightRect.topLeft().rx() - widthOfPic - 20, m_iconRightRect.topLeft().ry());
-            qDebug() << m_iconRightRect.topLeft().rx() - widthOfPic - 20 << ", " << m_iconRightRect.topLeft().ry();
+            picLabel->move(m_iconRightRect.topLeft().rx() - widthOfPic - 20, m_iconRightRect.topLeft().ry() + nameHeight);
+//            qDebug() << m_iconRightRect.topLeft().rx() - widthOfPic - 20 << ", " << m_iconRightRect.topLeft().ry();
             picLabel->setVisible(true);
             return;
         }
@@ -279,9 +313,9 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
 
         //三角
         QPointF points[3] = {
-            QPointF(m_sanjiaoRightRect.x()+m_sanjiaoRightRect.width(), 30),
-            QPointF(m_sanjiaoRightRect.x(), 25),
-            QPointF(m_sanjiaoRightRect.x(), 35),
+            QPointF(m_sanjiaoRightRect.x()+m_sanjiaoRightRect.width(), 30 + nameHeight),
+            QPointF(m_sanjiaoRightRect.x(), 25 + nameHeight),
+            QPointF(m_sanjiaoRightRect.x(), 35 + nameHeight),
         };
         QPen pen;
         pen.setColor(col_Kuang);
