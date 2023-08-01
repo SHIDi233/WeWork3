@@ -34,6 +34,33 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    //    if(event->buttons() == Qt::LeftButton){  //如果这里写这行代码，拖动会有点问题
+    if(mouse_press){
+        move(event->globalPos() - mousePoint);
+        //        event->accept();
+    }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if( (event->button() == Qt::LeftButton) ){
+        mouse_press = true;
+        mousePoint = event->globalPos() - this->pos();
+        //        event->accept();
+    }
+    else if(event->button() == Qt::RightButton){
+        //如果是右键
+        this->close();
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    mouse_press = false;
+}
+
 //登录函数，返回存有好友列表的chatObject对象指针
 chatObject *MainWindow::log(QString ID, QString pw) {
     //从服务器获取本人信息，如果登录失败返回nullptr*************************
