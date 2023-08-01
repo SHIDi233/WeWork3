@@ -182,7 +182,7 @@ void logWindow::on_send_button_clicked()
     QString msg = ui->texteditInput->toPlainText();
     if(msg == "") { return; }
     ui->texteditInput->clear();
-    setMsg(msg, chats[cur_index]->getID(), chats[cur_index]->getName(), QNChatMessage::User_Me, me->getID());
+    setMsg(msg, chats[cur_index]->getID(), me->getName(), QNChatMessage::User_Me, me->getID());
 
 
 //    } else {
@@ -217,6 +217,7 @@ void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Ty
 
         QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
+        messageW->setName(name);
         dealMessage(messageW, item, msg, time, type);
     } else {
         bool isOver = true;
@@ -232,6 +233,7 @@ void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Ty
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
+            messageW->setName(name);
             dealMessage(messageW, item, msg, time, type);
             messageW->setTextSuccess();
         }
@@ -260,6 +262,7 @@ void logWindow::setPic(QString path, int ID, QString name, QNChatMessage::User_T
 
         QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
+        messageW->setName(name);
         dealPic(messageW, item, path, time, type);
     } else {
         bool isOver = true;
@@ -275,6 +278,7 @@ void logWindow::setPic(QString path, int ID, QString name, QNChatMessage::User_T
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
+            messageW->setName(name);
             dealPic(messageW, item, path, time, type);
             messageW->setTextSuccess();
         }
