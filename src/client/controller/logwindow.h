@@ -7,6 +7,7 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QSystemTrayIcon>
 #include "pojo/chatobject.h"
 #include "widget_override/friendframe.h"
 #include "widget.h"
@@ -57,6 +58,8 @@ private:
     QVector<chatObject*> chats;//聊天对象们
     QVector<QVBoxLayout*> chat_layouts;
     QVector<QListWidget*> chat_lists;
+    QSystemTrayIcon  * systemtrayicon;  //系统托盘
+
 };
 
 #endif // LOGWINDOW_H
