@@ -13,12 +13,30 @@ void ChatMsg::setChatID(int chatID) {
     _chatID = chatID;
 }
 
-void ChatMsg::setType(MsgType type) {
-    _type = type;
+void ChatMsg::setType(int type) {
+    switch (type) {
+    case 0:
+        _type = Word;
+        break;
+    case 1:
+        _type = Pic;
+        break;
+    case 2:
+        _type = Video;
+        break;
+    default:
+        _type = File;
+        break;
+    }
+
 }
 
-void ChatMsg::setIsRead(bool isRead) {
-    _isRead = isRead;
+void ChatMsg::setIsRead(int isRead) {
+    if(isRead == 0){
+        _isRead = false;
+    }else{
+        _isRead = true;
+    }
 }
 
 void ChatMsg::setTime(QString time) {
