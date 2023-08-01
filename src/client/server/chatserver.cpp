@@ -25,12 +25,14 @@ void ChatServer::wordStorage(int chatID, QString content, TYPE type, QString tim
 //调用前必须使用
 void ChatServer::initDatabase()
 {
+    qDebug() << User::getUser()->getID();
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    QDir dbDir(setting::getGlobalPath() + + "/storage/" + User::getUser()->getID());
+    QDir dbDir(setting::getGlobalPath() + + "\\storage\\" + QString::number(User::getUser()->getID()));
+    qDebug() << setting::getGlobalPath() + + "\\storage\\" + QString::number(User::getUser()->getID());
     if (!dbDir.exists()) {
         dbDir.mkpath(".");
     }
-    db.setDatabaseName(setting::getGlobalPath() + "/storage/" + User::getUser()->getID() + "/chat_record.db");
+    db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
     QString create_sql = "create table record (recordID INTEGER PRIMARY KEY, ID int, chatID int, record text, time time, type varchar(20), isRead int DEFAULT 0)";
     if(db.open()){
         qDebug() << create_sql;
@@ -44,9 +46,10 @@ void ChatServer::initDatabase()
 
 int ChatServer::ChatStorage(int ID, QString content, ChatMsg::MsgType type, int chatID, QString time)
 {
+    qDebug() << User::getUser()->getID();
     int recordID = 0;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(setting::getGlobalPath() + "/storage/" + User::getUser()->getID() + "/chat_record.db");
+    db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
     QString insert_sql = QString("insert into record(ID, chatID, record, time, type) values(%1,%2,%3,%4,%5)")
                              .arg(ID).arg(chatID).arg("\'" + content + "\'").arg("\'" + time + "\'").arg(type);
     if(db.open()){
@@ -62,16 +65,17 @@ int ChatServer::ChatStorage(int ID, QString content, ChatMsg::MsgType type, int 
 
 QVector<ChatMsg *> ChatServer::getMsgs()
 {
+    qDebug() << User::getUser()->getID();
     QVector<ChatMsg *> result_;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(setting::getGlobalPath() + "/storage/" + User::getUser()->getID() + "/chat_record.db");
-    QString sql = QString("select * from record where ID = %1").arg(User::getUser()->getID());
+    db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
+    QString sql = QString("select * from record");
     if(db.open()){
         QSqlQuery result = db.exec(sql);
         while(result.next()){
             ChatMsg* temp = new ChatMsg();
             temp->setChatID(result.value("chatID").toInt());
-            temp->setID(User::getUser()->getID());
+            temp->setID(result.value("ID").toInt());
             temp->setContent(result.value("record").toString());
             temp->setTime(result.value("time").toString());
             temp->setType(result.value("type").toInt());
@@ -87,7 +91,7 @@ QVector<ChatMsg *> ChatServer::getMsgs(QString sTime, QString eTime)
 {
     QVector<ChatMsg *> result_;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(setting::getGlobalPath() + "/storage/" + User::getUser()->getID() + "/chat_record.db");
+    db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
     QString sql = QString("select * from record where time1 <= %1 and time1 >= %2")
                       .arg("\'" + sTime + "\'").arg("\'" + eTime + "\'");
     if(db.open()){

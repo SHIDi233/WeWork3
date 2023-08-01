@@ -1,4 +1,5 @@
 #include "logwindow.h"
+#include "server/chatserver.h"
 #include "ui_logwindow.h"
 #include <QLayout>
 #include <QSpacerItem>
@@ -148,6 +149,8 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 
     connect(ui->chat_list, SIGNAL(itemClicked(QListWidgetItem*)),
                 this, SLOT(onListMailItemClicked(QListWidgetItem*)));
+
+    init();
 }
 
 void logWindow::onListMailItemClicked(QListWidgetItem* item)
@@ -171,7 +174,16 @@ void logWindow::onListMailItemClicked(QListWidgetItem* item)
  * @brief 从本地数据库中获取数据并展示
  */
 void logWindow::init() {
-
+    ChatServer::initDatabase();
+    QVector<ChatMsg*> msg = ChatServer::getMsgs();
+    for(auto &m : msg) {
+        if(m->getType() == ChatMsg::Word) {
+            QNChatMessage::User_Type t;
+            if(m->getChatID() == me->getID()) { t = QNChatMessage::User_Me; }
+            else { t = QNChatMessage::User_She; }
+            setMsg(m->getContent(), m->getID(), t, m->getChatID(), false);
+        }
+    }
 }
 
 logWindow::~logWindow()
@@ -219,7 +231,8 @@ void logWindow::on_send_button_clicked()
     if(msg == "") { return; }
     ui->texteditInput->clear();
     setMsg(msg, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
-
+    QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+    ChatServer::ChatStorage(chats[cur_index]->getID(), msg, ChatMsg::Word, me->getID(), time);
 
 //    } else {
 //        if(msg != "") {
@@ -232,7 +245,7 @@ void logWindow::on_send_button_clicked()
 //    }
 }
 
-void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID) {
+void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID, bool needTime) {
 
     int index = -1;
     //寻找消息发送对象
@@ -261,37 +274,37 @@ void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int c
     bool isSending = false; // 发送中
     QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
 
-    qDebug()<<"addMessage" << msg << time << chat_lists[cur_index]->count();
+//    qDebug()<<"addMessage" << msg << time << chat_lists[cur_index]->count();
     if(isSending) {
-        dealMessageTime(time);
+        if(needTime) { dealMessageTime(time, index); }
 
         QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
         messageW->setName(name);
-        dealMessage(messageW, item, msg, time, type);
+        dealMessage(messageW, item, msg, time, type, index);
     } else {
         bool isOver = true;
-        for(int i = chat_lists[index]->count() - 1; i > 0; i--) {
-            QNChatMessage* messageW = (QNChatMessage*)chat_lists[index]->itemWidget(chat_lists[index]->item(i));
-            if(messageW->text() == msg) {
-                isOver = false;
-                messageW->setTextSuccess();
-            }
-        }
+//        for(int i = chat_lists[index]->count() - 1; i > 0; i--) {
+//            QNChatMessage* messageW = (QNChatMessage*)chat_lists[index]->itemWidget(chat_lists[index]->item(i));
+//            if(messageW->text() == msg) {
+//                isOver = false;
+//                messageW->setTextSuccess();
+//            }
+//        }
         if(1) {
-            dealMessageTime(time);
+            if(needTime) { dealMessageTime(time, index); }
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
             messageW->setName(name);
-            dealMessage(messageW, item, msg, time, type);
+            dealMessage(messageW, item, msg, time, type, index);
             messageW->setTextSuccess();
         }
     }
     chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
 }
 
-void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID) {
+void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime) {
 
     int index = -1;
     //寻找消息发送对象
@@ -323,7 +336,7 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
 
 //    qDebug()<<"addMessage" << msg << time << chat_lists[cur_index]->count();
     if(isSending) {
-        dealMessageTime(time);
+        if(needTime) { dealMessageTime(time, index); }
 
         QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
         QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
@@ -339,7 +352,7 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
             }
         }
         if(1) {
-            dealMessageTime(time);
+            if(needTime) { dealMessageTime(time, index); }
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
@@ -351,7 +364,7 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
     chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
 }
 
-void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type)
+void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type, int index)
 {
     messageW->setFixedWidth(ui->chat_stack_widget->width() - 4);
     QSize size = messageW->fontRect(text);
@@ -361,7 +374,7 @@ void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QStr
     messageW->setText(text, time, size, type);
     messageW->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
 //    item->setSizeHint()
-    chat_lists[cur_index]->setItemWidget(item, messageW);
+    chat_lists[index]->setItemWidget(item, messageW);
 }
 
 void logWindow::dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time,  QNChatMessage::User_Type type)
@@ -377,12 +390,12 @@ void logWindow::dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString 
     chat_lists[cur_index]->setItemWidget(item, messageW);
 }
 
-void logWindow::dealMessageTime(QString curMsgTime)
+void logWindow::dealMessageTime(QString curMsgTime, int index)
 {
     bool isShowTime = false;
-    if(chat_lists[cur_index]->count() > 0) {
-        QListWidgetItem* lastItem = chat_lists[cur_index]->item(chat_lists[cur_index]->count() - 1);
-        QNChatMessage* messageW = (QNChatMessage*)chat_lists[cur_index]->itemWidget(lastItem);
+    if(chat_lists[index]->count() > 0) {
+        QListWidgetItem* lastItem = chat_lists[index]->item(chat_lists[index]->count() - 1);
+        QNChatMessage* messageW = (QNChatMessage*)chat_lists[index]->itemWidget(lastItem);
         int lastTime = messageW->time().toInt();
         int curTime = curMsgTime.toInt();
         qDebug() << "curTime lastTime:" << curTime - lastTime;
@@ -392,14 +405,14 @@ void logWindow::dealMessageTime(QString curMsgTime)
         isShowTime = true;
     }
     if(isShowTime) {
-        QNChatMessage* messageTime = new QNChatMessage(chat_lists[cur_index]->parentWidget());
-        QListWidgetItem* itemTime = new QListWidgetItem(chat_lists[cur_index]);
+        QNChatMessage* messageTime = new QNChatMessage(chat_lists[index]->parentWidget());
+        QListWidgetItem* itemTime = new QListWidgetItem(chat_lists[index]);
 
         QSize size = QSize(ui->chat_stack_widget->width() - 4, 40);
         messageTime->resize(size);
         itemTime->setSizeHint(size);
         messageTime->setText(curMsgTime, curMsgTime, size, QNChatMessage::User_Time);
-        chat_lists[cur_index]->setItemWidget(itemTime, messageTime);
+        chat_lists[index]->setItemWidget(itemTime, messageTime);
     }
 }
 

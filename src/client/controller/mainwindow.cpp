@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "utils/setting.h"
+#include "pojo/user.h"
 
 
 
@@ -95,6 +96,9 @@ void MainWindow::on_log_button_clicked()
     p->members.push_back(p1);
     p->members.push_back(p2);
     p->members.push_back(p3);
+    User::getUser()->setID(111);
+    User::getUser()->setName("Apple");
+//    User::getUser().set
 
     this->mainframe = new logWindow(p);
     this->hide();
