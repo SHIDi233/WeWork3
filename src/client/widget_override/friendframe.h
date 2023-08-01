@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QPushButton>
 
-class FriendFrame : public QPushButton
+class FriendFrame : public QWidget
 {
     Q_OBJECT
 public:

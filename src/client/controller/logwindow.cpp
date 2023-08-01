@@ -68,13 +68,17 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 
     //初始化聊天窗口
     for(int i = 0; i < chats.size(); i++) {
-        FriendFrame *qpb = new FriendFrame(chats[i]->getHead(), chats[i]->getName());
+        FriendFrame *qpb = new FriendFrame(chats[i]->getHead(), chats[i]->getName(), ui->chat_list);
 
         //friends.push_back(qpb);
         //qpb->setText(QString(chats[i]->getName()));
         qpb->setMinimumSize(QSize(232, 70));
-        friends.push_back(qpb);
-        fLayout->addWidget(qpb);
+        //friends.push_back(qpb);
+        QListWidgetItem *item = new QListWidgetItem(ui->chat_list);
+        item->setSizeHint(QSize(232, 70));
+        qpb->setVisible(true);
+        ui->chat_list->setItemWidget(item, qpb);
+        //fLayout->addWidget(qpb);
 
 //        QScrollArea *chat_area = new QScrollArea();
         QListWidget *chat_area = new QListWidget();
@@ -106,14 +110,14 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
         fLayout->addSpacerItem(new QSpacerItem(20, 9 + (9 - chats.size()) * 70, QSizePolicy::Expanding));
     }
     //设置点击事件
-    for(int i = 0; i < friends.size(); i++) {
-        QPushButton *qpb = friends[i];
-        connect(qpb, &QPushButton::clicked, this, [=](){
-            cur_index = i;
-            ui->chat_title->setText(chats[i]->getName());
-            ui->chat_stack_widget->setCurrentIndex(i + 2);
-        });
-    }
+//    for(int i = 0; i < friends.size(); i++) {
+//        QPushButton *qpb = friends[i];
+//        connect(qpb, &QPushButton::clicked, this, [=](){
+//            cur_index = i;
+//            ui->chat_title->setText(chats[i]->getName());
+//            ui->chat_stack_widget->setCurrentIndex(i + 2);
+//        });
+//    }
 
 //    QPushButton *qpb = friends[1];
 //    fLayout->removeWidget(qpb);
