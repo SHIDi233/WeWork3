@@ -122,16 +122,6 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 
 
 
-    //初始化系统托盘
-    systemtrayicon = new QSystemTrayIcon(this);
-    QIcon icon = QIcon(":/lib/qusefdogicon.png");
-    //添加图标
-    systemtrayicon->setIcon(icon);
-    //当鼠标悬浮，显示文字
-    systemtrayicon->setToolTip(QObject::trUtf8("Fdog"));
-    //显示图标
-    systemtrayicon->show();
-
 }
 
 /**
