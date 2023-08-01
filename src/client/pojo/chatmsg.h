@@ -3,15 +3,17 @@
 
 #include <QString>
 
+
+
 class ChatMsg
 {
 public:
 
     enum MsgType {
-        Word,
-        Pic,
-        Video,
-        File
+        Word = 0,
+        Pic = 1,
+        Video = 2,
+        File = 3
     };
 
     ChatMsg();
@@ -20,9 +22,9 @@ public:
 
     void setChatID(int chatID);
 
-    void setType(MsgType type);
+    void setType(int type);
 
-    void setIsRead(bool isRead);
+    void setIsRead(int isRead);
 
     void setTime(QString time);
 
