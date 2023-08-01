@@ -119,9 +119,6 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     //初始化朋友圈
     pyq = new Widget(me, ui->scrollArea_3);
     pyq->show();
-
-
-
 }
 
 /**
