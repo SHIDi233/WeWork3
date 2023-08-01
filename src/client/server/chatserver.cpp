@@ -1,4 +1,6 @@
 #include "chatserver.h"
+#include "utils/setting.h"
+#include "pojo/user.h"
 
 
 /**
@@ -20,3 +22,6 @@ void ChatServer::wordStorage(int chatID, QString content, TYPE type, QString tim
     db.close();
 }
 
+void ChatStorage(int ID, QString content, ChatMsg::MsgType type, int chatID, QString time) {
+
+}

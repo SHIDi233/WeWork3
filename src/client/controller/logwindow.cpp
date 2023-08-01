@@ -5,6 +5,7 @@
 #include "msgitem.h"
 #include "mesend.h"
 #include "friendsend.h"
+#include "utils/setting.h"
 #include <QFileDialog>
 
 logWindow::logWindow(chatObject *me ,QWidget *parent) :
@@ -90,6 +91,8 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 //        chat_area->setFixedWidth(300);
         chat_area->setAutoScroll(true);
         chat_area->setAutoScrollMargin(16);
+        chat_area->setSelectionRectVisible(false);
+        chat_area->setSelectionMode(QAbstractItemView::NoSelection);
 //        chat_area->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
         chat_area_layout->setMargin(0);
 //        chat_area->setWidget(widget);
@@ -119,6 +122,13 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     //初始化朋友圈
     pyq = new Widget(me, ui->scrollArea_3);
     pyq->show();
+
+    //初始化设置界面
+    ui->path_line->setText(setting::getGlobalPath());
+    ui->key_hint->setVisible(false);
+    ui->iv_hint->setVisible(false);
+    ui->key_line->setText(setting::getKey());
+    ui->iv_line->setText(setting::getIv());
 }
 
 /**
@@ -172,7 +182,7 @@ void logWindow::on_send_button_clicked()
     QString msg = ui->texteditInput->toPlainText();
     if(msg == "") { return; }
     ui->texteditInput->clear();
-    setMsg(msg, chats[cur_index]->getID(), chats[cur_index]->getName(), QNChatMessage::User_Me);
+    setMsg(msg, chats[cur_index]->getID(), chats[cur_index]->getName(), QNChatMessage::User_Me, me->getID());
 
 
 //    } else {
@@ -186,7 +196,7 @@ void logWindow::on_send_button_clicked()
 //    }
 }
 
-void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type) {
+void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type, int chatID) {
 
     int index = -1;
     //寻找消息发送对象
@@ -495,3 +505,57 @@ bool logWindow::receiveFile(QString path, int ID, QString name) {
     pHboxLayout->addWidget(friendSend);
     chat_layouts[cur_index]->addLayout(pHboxLayout);
 }
+
+void logWindow::on_path_change_clicked()
+{
+
+}
+
+
+void logWindow::on_path_open_clicked()
+{
+
+}
+
+
+void logWindow::on_key_change_clicked()
+{
+    ui->key_line->setReadOnly(false);
+    ui->key_line->selectAll();
+}
+
+
+
+
+void logWindow::on_key_save_clicked()
+{
+    QString key = ui->key_line->text();
+    if(key.size() != 16) {
+        ui->key_hint->setVisible(true);
+        return;
+    }
+    ui->key_hint->setVisible(false);
+    ui->key_line->setReadOnly(true);
+    setting::setKey(key);
+}
+
+
+void logWindow::on_iv_change_clicked()
+{
+    ui->iv_line->setReadOnly(false);
+    ui->iv_line->selectAll();
+}
+
+
+void logWindow::on_iv_save_clicked()
+{
+    QString iv = ui->iv_line->text();
+    if(iv.size() != 16) {
+        ui->iv_hint->setVisible(true);
+        return;
+    }
+    ui->iv_hint->setVisible(false);
+    ui->iv_line->setReadOnly(true);
+    setting::setKey(iv);
+}
+

@@ -32,7 +32,7 @@ public:
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
     void dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime);
-    void setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type);
+    void setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type, int chatID);
     void setPic(QString path, int ID, QString name, QNChatMessage::User_Type type);
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -46,6 +46,18 @@ private slots:
     void on_video_send_clicked();
 
     void on_video_send_2_clicked();
+
+    void on_path_change_clicked();
+
+    void on_path_open_clicked();
+
+    void on_key_change_clicked();
+
+    void on_key_save_clicked();
+
+    void on_iv_change_clicked();
+
+    void on_iv_save_clicked();
 
 private:
     Widget *pyq;//朋友圈

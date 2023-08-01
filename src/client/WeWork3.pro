@@ -12,6 +12,7 @@ CONFIG += c++11
 
 SOURCES += \
     controller/addfriend.cpp \
+    pojo/chatmsg.cpp \
     pojo/chatobject.cpp \
     pojo/user.cpp \
     server/chatserver.cpp \
@@ -28,7 +29,7 @@ SOURCES += \
     controller/mesend.cpp \
     controller/msgitem.cpp \
     controller/person.cpp \
-    piclabel.cpp \
+    widget_override/piclabel.cpp \
     controller/widget.cpp \
     controller/home.cpp \
     server/logserver.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
 
 HEADERS += \
     controller/addfriend.h \
+    pojo/chatmsg.h \
     pojo/chatobject.h \
     command.h \
     pojo/user.h \
@@ -52,7 +54,7 @@ HEADERS += \
     controller/mesend.h \
     controller/msgitem.h \
     controller/person.h \
-    piclabel.h \
+    widget_override/piclabel.h \
     controller/widget.h \
     controller/home.h \
     server/logserver.h \
