@@ -157,7 +157,7 @@ void logWindow::onListMailItemClicked(QListWidgetItem* item)
 //    }
     auto item2 = (ChatListItem*) item;
     int ID = item2->getID();
-    qDebug() << "select" << ID;
+//    qDebug() << "select" << ID;
     for(int i = 0; i < chats.size(); i++) {
         if(chats[i]->getID() == ID) {
             ui->chat_title->setText(chats[i]->getName());
@@ -218,7 +218,7 @@ void logWindow::on_send_button_clicked()
     QString msg = ui->texteditInput->toPlainText();
     if(msg == "") { return; }
     ui->texteditInput->clear();
-    setMsg(msg, chats[cur_index]->getID(), me->getName(), QNChatMessage::User_Me, me->getID());
+    setMsg(msg, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
 
 
 //    } else {
@@ -232,7 +232,7 @@ void logWindow::on_send_button_clicked()
 //    }
 }
 
-void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type, int chatID) {
+void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID) {
 
     int index = -1;
     //寻找消息发送对象
@@ -243,6 +243,20 @@ void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Ty
         }
     }
     if(index == -1) { return; }
+    QString name;
+    if(type == QNChatMessage::User_Me) {
+        name = me->getName();
+    }
+    else if(ID == chatID) {
+        name = chats[index]->getName();
+    } else {
+        for(int i = 0; i < chats[index]->members.size(); i++) {
+            if(chats[index]->members[i]->getID() == chatID) {
+                name = chats[index]->members[i]->getName();
+                break;
+            }
+        }
+    }
 
     bool isSending = false; // 发送中
     QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
@@ -264,7 +278,7 @@ void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Ty
                 messageW->setTextSuccess();
             }
         }
-        if(isOver) {
+        if(1) {
             dealMessageTime(time);
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
@@ -277,7 +291,7 @@ void logWindow::setMsg(QString msg, int ID, QString name, QNChatMessage::User_Ty
     chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
 }
 
-void logWindow::setPic(QString path, int ID, QString name, QNChatMessage::User_Type type) {
+void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID) {
 
     int index = -1;
     //寻找消息发送对象
@@ -288,6 +302,21 @@ void logWindow::setPic(QString path, int ID, QString name, QNChatMessage::User_T
         }
     }
     if(index == -1) { return; }
+
+    QString name;
+    if(type == QNChatMessage::User_Me) {
+        name = me->getName();
+    }
+    else if(ID == chatID) {
+        name = chats[index]->getName();
+    } else {
+        for(int i = 0; i < chats[index]->members.size(); i++) {
+            if(chats[index]->members[i]->getID() == chatID) {
+                name = chats[index]->members[i]->getName();
+                break;
+            }
+        }
+    }
 
     bool isSending = false; // 发送中
     QString time = QString::number(QDateTime::currentDateTime().toTime_t()); //时间戳
@@ -309,7 +338,7 @@ void logWindow::setPic(QString path, int ID, QString name, QNChatMessage::User_T
                 messageW->setTextSuccess();
             }
         }
-        if(isOver) {
+        if(1) {
             dealMessageTime(time);
 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
@@ -410,7 +439,7 @@ void logWindow::on_pic_send_clicked()
 
 //    //receivePic(picPath, 123, "童雪");
 //    //通过网络发送图片(picPath路径的图片)****************************
-    setPic(picPath, chats[cur_index]->getID(), chats[cur_index]->getName(), QNChatMessage::User_Me);
+    setPic(picPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
 
 
 

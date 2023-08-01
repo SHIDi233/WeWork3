@@ -34,8 +34,8 @@ public:
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type);
     void dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime);
-    void setMsg(QString msg, int ID, QString name, QNChatMessage::User_Type type, int chatID);
-    void setPic(QString path, int ID, QString name, QNChatMessage::User_Type type);
+    void setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID);
+    void setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID);
 protected:
     void resizeEvent(QResizeEvent *event);
 private:

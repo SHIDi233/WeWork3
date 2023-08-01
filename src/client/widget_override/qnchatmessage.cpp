@@ -296,7 +296,7 @@ void QNChatMessage::paintEvent(QPaintEvent *event)
         nameLabel->adjustSize();
         nameLabel->move(m_iconRightRect.topLeft().rx() - 20 - nameLabel->width(), m_iconRightRect.topLeft().ry());
         nameLabel->setVisible(true);
-        qDebug() << nameLabel->width() << nameLabel->text();
+//        qDebug() << nameLabel->width() << nameLabel->text();
 
         if(m_chatType == Chat_Pic) {
             picLabel->move(m_iconRightRect.topLeft().rx() - widthOfPic - 20, m_iconRightRect.topLeft().ry() + nameHeight);
