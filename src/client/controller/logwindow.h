@@ -13,6 +13,7 @@
 #include "widget.h"
 #include "widget_override/qnchatmessage.h"
 #include <QListWidgetItem>
+#include "widget_override/ChatListItem.h"
 
 namespace Ui {
 class logWindow;
@@ -59,6 +60,8 @@ private slots:
     void on_iv_change_clicked();
 
     void on_iv_save_clicked();
+public Q_SLOTS:
+    void onListMailItemClicked(QListWidgetItem* item);
 
 private:
     Widget *pyq;//朋友圈

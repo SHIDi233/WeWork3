@@ -47,6 +47,7 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     });
 
 
+
     QVBoxLayout *fLayout = new QVBoxLayout();
     //QSpacerItem *spacer = new QSpacerItem(232, 70);
 //    fLayout->setVerticalSpacing(0);
@@ -74,10 +75,11 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
         //qpb->setText(QString(chats[i]->getName()));
         qpb->setMinimumSize(QSize(232, 70));
         //friends.push_back(qpb);
-        QListWidgetItem *item = new QListWidgetItem(ui->chat_list);
+        ChatListItem *item = new ChatListItem(chats[i]->getID(), ui->chat_list);
         item->setSizeHint(QSize(232, 70));
         qpb->setVisible(true);
         ui->chat_list->setItemWidget(item, qpb);
+//        ui->chat_list->addItem(item);
         //fLayout->addWidget(qpb);
 
 //        QScrollArea *chat_area = new QScrollArea();
@@ -143,6 +145,26 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     systemtrayicon->setToolTip(QObject::trUtf8("Fdog"));
     //显示图标
     systemtrayicon->show();
+
+    connect(ui->chat_list, SIGNAL(itemClicked(QListWidgetItem*)),
+                this, SLOT(onListMailItemClicked(QListWidgetItem*)));
+}
+
+void logWindow::onListMailItemClicked(QListWidgetItem* item)
+{
+//    if (ui->listMail->item(0) == item) {
+//        // This is the first item.
+//    }
+    auto item2 = (ChatListItem*) item;
+    int ID = item2->getID();
+    qDebug() << "select" << ID;
+    for(int i = 0; i < chats.size(); i++) {
+        if(chats[i]->getID() == ID) {
+            ui->chat_title->setText(chats[i]->getName());
+            ui->chat_stack_widget->setCurrentIndex(i + 2);
+            cur_index = i;
+        }
+    }
 }
 
 /**

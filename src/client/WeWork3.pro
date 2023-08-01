@@ -20,6 +20,7 @@ SOURCES += \
     utils/setting.cpp \
     web/chatweb.cpp \
     web/logweb.cpp \
+    widget_override/ChatListItem.cpp \
     widget_override/friendframe.cpp \
     controller/friendsend.cpp \
     server/logserver.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     utils/setting.h \
     web/chatweb.h \
     web/logweb.h \
+    widget_override/ChatListItem.h \
     widget_override/friendframe.h \
     controller/friendsend.h \
     server/logserver.h \
