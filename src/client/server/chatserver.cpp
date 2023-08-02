@@ -2,6 +2,8 @@
 #include "utils/setting.h"
 #include "pojo/user.h"
 
+#include "global.h"
+
 
 /**
  * @brief 将聊天内容存入本地
@@ -80,6 +82,7 @@ int ChatServer::ChatStorage(int ID, QString content, ChatMsg::MsgType type, int 
 //            temp->setIsRead(result.value("isRead").toInt());
 //            result_.append(temp);
 //        }
+
 //    }
 //    db.close();
 //    return result_;
@@ -104,6 +107,23 @@ QVector<ChatMsg *> ChatServer::getMsgs()
             temp->setIsRead(result.value("isRead").toInt());
             temp->setWebID(result.value("webID").toString());
             result_.append(temp);
+        }
+    }
+
+    sql = QString("select max(webID) from record");
+    if(db.open()){
+        QSqlQuery result = db.exec(sql);
+        while(result.next()){
+            qDebug()<<result.value(0).toString();
+            if(result.value(0).toString()!="")
+            {
+                Config::get()->server->setLast(result.value(0).toString().toInt());
+                qDebug()<<"获得了最新值";
+            }
+            else{
+                Config::get()->server->setLast(0);
+                qDebug()<<"获得了最旧值";
+            }
         }
     }
     db.close();

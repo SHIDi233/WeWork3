@@ -96,7 +96,7 @@ void MainWindow::on_log_button_clicked()
         //登录成功，获取好友列表
         QStringList peos = Config::get()->server->rece_peo();
 
-        chatObject *p = new chatObject("test name", 0, 1, TYPE::Me);
+        chatObject *p = new chatObject("test name", 0, ID.toInt(), TYPE::Me);
         for(int i=0;i<peos.length();i++){
 //            QListWidgetItem *widgetItem = new QListWidgetItem(ui->listWidget);
 //            widgetItem->setSizeHint(QSize(60, 108));
@@ -113,7 +113,7 @@ void MainWindow::on_log_button_clicked()
              p->members.push_back(p1);
 
         }
-        User::getUser()->setID(1);
+        User::getUser()->setID(ID.toInt());
         User::getUser()->setName("Apple");
 
         this->mainframe = new logWindow(p);

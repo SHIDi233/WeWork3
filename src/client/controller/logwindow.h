@@ -62,6 +62,9 @@ private slots:
     void on_iv_save_clicked();
 
     void update_msg();
+
+    void refresh_msg();
+
 public Q_SLOTS:
     void onListMailItemClicked(QListWidgetItem* item);
 

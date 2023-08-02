@@ -1,6 +1,6 @@
-#include "mesend.h"
+﻿#include "mesend.h"
 #include "ui_mesend.h"
-#include "piclabel.h"
+#include "widget_override/piclabel.h"
 
 MeSend::MeSend(QWidget* parent, QWidget *chat, int head, QString name) :
     QWidget(parent),

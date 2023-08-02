@@ -53,7 +53,6 @@ bool Server::login(QString acc, QString pass){
 void Server::update()
 {
     isOnline=false;
-    delete socket;
     QTcpSocket* socket=new QTcpSocket;
     socket->connectToHost(ip, port.toUShort());
 
@@ -169,6 +168,7 @@ QVector<QStringList> Server::rece_msg(){
 
                 QJsonValue msgID = x2.value("msgID");
                 QJsonValue senderID = x2.value("senderID");
+                QJsonValue receiverID = x2.value("receiverID");
                 QJsonValue Type = x2.value("Type");
                 QJsonValue Time = x2.value("Time");
                 QJsonValue Content = x2.value("Content");
@@ -181,7 +181,7 @@ QVector<QStringList> Server::rece_msg(){
                 chatNum = msgID.toString().toInt();
                 qDebug()<<chatNum;
                 qs.append(Content.toString());
-
+                qs.append(receiverID.toString());
                 res.append(qs);
             }
         }

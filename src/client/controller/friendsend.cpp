@@ -1,6 +1,6 @@
-#include "friendsend.h"
+﻿#include "friendsend.h"
 #include "ui_friendsend.h"
-#include "piclabel.h"
+#include "widget_override/piclabel.h"
 
 FriendSend::FriendSend(QWidget* parent, QWidget *chat, int head, QString name) :
     QWidget(parent),

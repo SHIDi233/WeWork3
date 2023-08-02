@@ -6,6 +6,7 @@
 #include "msgitem.h"
 #include "mesend.h"
 #include "friendsend.h"
+#include "utils/encryption.h"
 #include "utils/setting.h"
 #include <QFileDialog>
 
@@ -154,6 +155,10 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     connect(ui->chat_list, SIGNAL(itemClicked(QListWidgetItem*)),
                 this, SLOT(onListMailItemClicked(QListWidgetItem*)));
 
+    QTimer* m_pTimer = new QTimer(this);
+    connect(m_pTimer, SIGNAL(timeout()), this, SLOT(refresh_msg()));
+    m_pTimer->start(500);
+
     QTimer* m_pTimer_2 = new QTimer(this);
     connect(m_pTimer_2, SIGNAL(timeout()), this, SLOT(update_msg()));
     m_pTimer_2->start(1000);
@@ -164,13 +169,19 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 void logWindow::update_msg(){
     QtConcurrent::run([=]() {
         res = Config::get()->server->rece_msg();
-
     });
+
+}
+
+void logWindow::refresh_msg(){
     for(int i=0;i<res.count();i++){
-        setMsg(res[i][4],res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
+        QString eMsg = res[i][4];
+        QString msg = QString::fromStdString(Encryption::decryptWords(eMsg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString()));
+        setMsg(msg,res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
         QString time = QString::number(QDateTime::currentDateTime().toTime_t());
-        ChatServer::ChatStorage(res[i][1].toInt(), res[i][4], ChatMsg::Word, res[i][1].toInt(), time);
+        ChatServer::ChatStorage(res[i][1].toInt(), msg, ChatMsg::Word, res[i][1].toInt(), time, res[i][0]);
     }
+    res.clear();
 }
 
 void logWindow::onListMailItemClicked(QListWidgetItem* item)
@@ -221,7 +232,7 @@ void logWindow::on_send_button_clicked()
     ui->texteditInput->clear();
     int index = setMsg(msg, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
     QString time = QString::number(QDateTime::currentDateTime().toTime_t());
-    ChatServer::ChatStorage(chats[cur_index]->getID(), msg, ChatMsg::Word, me->getID(), time);
+    ChatServer::ChatStorage(chats[cur_index]->getID(), msg, ChatMsg::Word, me->getID(), time,"0");
 
 
     //网络发送
@@ -233,6 +244,7 @@ void logWindow::on_send_button_clicked()
 
     bool is;
     QtConcurrent::run([=]() {
+        QString eMsg = QString::fromStdString(Encryption::encryptWords(msg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString()));
         if(Config::get()->server->send_msg(QString::number(chats[index]->getID()),msg))
             qDebug()<<"已发送(异步)";
         else
