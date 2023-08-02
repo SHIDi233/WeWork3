@@ -1,4 +1,7 @@
 QT       += core gui sql
+QT       += network
+QT += concurrent
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,6 +19,10 @@ SOURCES += \
     pojo/chatobject.cpp \
     pojo/user.cpp \
     server/chatserver.cpp \
+    server/file_receiver.cpp \
+    server/file_sender.cpp \
+    server/global.cpp \
+    server/server.cpp \
     utils/encryption.cpp \
     utils/setting.cpp \
     web/chatweb.cpp \
@@ -43,6 +50,10 @@ HEADERS += \
     command.h \
     pojo/user.h \
     server/chatserver.h \
+    server/file_receiver.h \
+    server/file_sender.h \
+    server/global.h \
+    server/server.h \
     utils/encryption.h \
     utils/setting.h \
     web/chatweb.h \

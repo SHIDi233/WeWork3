@@ -1,9 +1,9 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "utils/setting.h"
 #include "pojo/user.h"
 
-
+#include "server/global.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -75,6 +75,7 @@ chatObject *MainWindow::log(QString ID, QString pw) {
 }
 
 
+
 void MainWindow::on_log_button_clicked()
 {
     QString ID = ui->log_id_line->text();
@@ -88,21 +89,54 @@ void MainWindow::on_log_button_clicked()
         return;
     }
 
+
+    Config::get()->server = new Server();
+    if(Config::get()->server->login(ID,pw)){
+
+        //登录成功，获取好友列表
+        QStringList peos = Config::get()->server->rece_peo();
+
+        chatObject *p = new chatObject("test name", 0, 1, TYPE::Me);
+        for(int i=0;i<peos.length();i++){
+//            QListWidgetItem *widgetItem = new QListWidgetItem(ui->listWidget);
+//            widgetItem->setSizeHint(QSize(60, 108));
+//            widgetItem->setText("1");
+//            ui->listWidget->addItem(widgetItem);
+//            People*  p = new People(this);
+//            p->setID(peos[i].toInt());
+//            p->setName(peos[i]);
+//            ui->listWidget->setItemWidget(widgetItem, p);
+
+//            connect(p, SIGNAL(clicked(int)), this, SLOT(onListMailItemClicked(int)));
+
+             chatObject *p1 = new chatObject(peos[i], 3, peos[i].toInt(), TYPE::Person);
+             p->members.push_back(p1);
+
+        }
+        User::getUser()->setID(1);
+        User::getUser()->setName("Apple");
+
+        this->mainframe = new logWindow(p);
+        this->hide();
+        this->mainframe->show();
+    }
+    else{//密码错误
+
+    }
+
     //测试数据
-    chatObject *p = new chatObject("Apple", 0, 111, TYPE::Me);
-    chatObject *p1 = new chatObject("童雪", 3, 123, TYPE::Person);
-    chatObject *p2 = new chatObject("刘海明", 2, 345, TYPE::Person);
-    chatObject *p3 = new chatObject("钱波", 4, 456, TYPE::Person);
-    p->members.push_back(p1);
-    p->members.push_back(p2);
-    p->members.push_back(p3);
-    User::getUser()->setID(111);
-    User::getUser()->setName("Apple");
+//    chatObject *p = new chatObject("Apple", 0, 111, TYPE::Me);
+//    chatObject *p1 = new chatObject("童雪", 3, 123, TYPE::Person);
+//    chatObject *p2 = new chatObject("刘海明", 2, 345, TYPE::Person);
+//    chatObject *p3 = new chatObject("钱波", 4, 456, TYPE::Person);
+//    p->members.push_back(p1);
+//    p->members.push_back(p2);
+//    p->members.push_back(p3);
+//    User::getUser()->setID(111);
+//    User::getUser()->setName("Apple");
 //    User::getUser().set
 
-    this->mainframe = new logWindow(p);
-    this->hide();
-    this->mainframe->show();
+
 }
 
 void MainWindow::on_reg_button_clicked()

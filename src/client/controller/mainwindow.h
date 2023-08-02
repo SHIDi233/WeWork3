@@ -1,4 +1,4 @@
-/**
+﻿/**
 * 登录注册窗口
 */
 
@@ -35,6 +35,7 @@ private slots:
     void on_minus_buton_clicked();
 
     void on_quit_button_clicked();
+
 
 private:
     Ui::MainWindow *ui;

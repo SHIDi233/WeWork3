@@ -1,4 +1,4 @@
-/**
+﻿/**
 * 登录或注册后显示的窗口
 */
 
@@ -34,7 +34,7 @@ public:
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type, int index);
     void dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time, QNChatMessage::User_Type type);
     void dealMessageTime(QString curMsgTime, int index);
-    void setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID, bool needTime=true);
+    int setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID, bool needTime=true);
     void setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime=true);
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -60,6 +60,8 @@ private slots:
     void on_iv_change_clicked();
 
     void on_iv_save_clicked();
+
+    void update_msg();
 public Q_SLOTS:
     void onListMailItemClicked(QListWidgetItem* item);
 
@@ -74,6 +76,8 @@ private:
     QVector<QVBoxLayout*> chat_layouts;
     QVector<QListWidget*> chat_lists;
     QSystemTrayIcon  * systemtrayicon;  //系统托盘
+
+    QVector<QStringList> res;
 
 };
 

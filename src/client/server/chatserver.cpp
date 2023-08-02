@@ -1,4 +1,4 @@
-#include "chatserver.h"
+﻿#include "chatserver.h"
 #include "utils/setting.h"
 #include "pojo/user.h"
 
@@ -61,7 +61,29 @@ int ChatServer::ChatStorage(int ID, QString content, ChatMsg::MsgType type, int 
 
 }
 
-
+//int ChatServer::getMax()
+//{
+//    qDebug() << User::getUser()->getID();
+//    int result_;
+//    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+//    db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
+//    QString sql = QString("select * from record");
+//    if(db.open()){
+//        QSqlQuery result = db.exec(sql);
+//        while(result.next()){
+//            ChatMsg* temp = new ChatMsg();
+//            temp->setChatID(result.value("chatID").toInt());
+//            temp->setID(result.value("ID").toInt());
+//            temp->setContent(result.value("record").toString());
+//            temp->setTime(result.value("time").toString());
+//            temp->setType(result.value("type").toInt());
+//            temp->setIsRead(result.value("isRead").toInt());
+//            result_.append(temp);
+//        }
+//    }
+//    db.close();
+//    return result_;
+//}
 
 QVector<ChatMsg *> ChatServer::getMsgs()
 {

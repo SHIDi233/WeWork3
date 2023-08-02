@@ -1,4 +1,4 @@
-#include "logwindow.h"
+﻿#include "logwindow.h"
 #include "server/chatserver.h"
 #include "ui_logwindow.h"
 #include <QLayout>
@@ -8,6 +8,10 @@
 #include "friendsend.h"
 #include "utils/setting.h"
 #include <QFileDialog>
+
+#include "server/global.h"
+#include <QtConcurrent>
+
 
 logWindow::logWindow(chatObject *me ,QWidget *parent) :
     QWidget(parent),
@@ -127,8 +131,8 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 //    fLayout->insertWidget(0, qpb);
 
     //初始化朋友圈
-    pyq = new Widget(me, ui->scrollArea_3);
-    pyq->show();
+//    pyq = new Widget(me, ui->scrollArea_3);
+//    pyq->show();
 
     //初始化设置界面
     ui->path_line->setText(setting::getGlobalPath());
@@ -150,7 +154,23 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     connect(ui->chat_list, SIGNAL(itemClicked(QListWidgetItem*)),
                 this, SLOT(onListMailItemClicked(QListWidgetItem*)));
 
+    QTimer* m_pTimer_2 = new QTimer(this);
+    connect(m_pTimer_2, SIGNAL(timeout()), this, SLOT(update_msg()));
+    m_pTimer_2->start(1000);
+
     init();
+}
+
+void logWindow::update_msg(){
+    QtConcurrent::run([=]() {
+        res = Config::get()->server->rece_msg();
+
+    });
+    for(int i=0;i<res.count();i++){
+        setMsg(res[i][4],res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
+        QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+        ChatServer::ChatStorage(res[i][1].toInt(), res[i][4], ChatMsg::Word, res[i][1].toInt(), time);
+    }
 }
 
 void logWindow::onListMailItemClicked(QListWidgetItem* item)
@@ -191,37 +211,6 @@ logWindow::~logWindow()
     delete ui;
 }
 
-//void logWindow::on_send_button_clicked()
-//{
-//    if(cur_index < 0) return;
-
-//    QString strInput = ui->texteditInputInput->toPlainText();
-//    //去除回车
-//    strInput.remove(QChar('\n'));
-//    ui->texteditInputInput->clear();
-
-//    //判断输入框是否为空
-//    if (strInput.isEmpty()) {
-//        return ;
-//    }
-
-//    QHBoxLayout *pHboxLayout = new QHBoxLayout();
-
-//    MsgItem *pItem = new MsgItem(ui->chat_stack_widget->widget(cur_index + 2), E_WHOSAY::eMe);
-//    pItem->setMsg(strInput);
-//    //pHboxLayout->addWidget(new QPushButton);
-//    MeSend *meSend = new MeSend(ui->chat_stack_widget->widget(cur_index + 2), pItem, me->getHead(), me->getName());
-//    pHboxLayout->insertStretch(0);
-//    pHboxLayout->addWidget(meSend);
-//    //m_pVboxLayout->addLayout(pHboxLayout);
-//    chat_layouts[cur_index]->addLayout(pHboxLayout);
-
-//    //m_pIknow->setQuestion(strInput);
-//    //receiveMsg(strInput, 123, "童雪");
-
-//    //通过网络发送文字(strInput)**************************
-//}
-
 void logWindow::on_send_button_clicked()
 {
     /* 将信息存入本地 */
@@ -230,22 +219,28 @@ void logWindow::on_send_button_clicked()
     QString msg = ui->texteditInput->toPlainText();
     if(msg == "") { return; }
     ui->texteditInput->clear();
-    setMsg(msg, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
+    int index = setMsg(msg, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
     QString time = QString::number(QDateTime::currentDateTime().toTime_t());
     ChatServer::ChatStorage(chats[cur_index]->getID(), msg, ChatMsg::Word, me->getID(), time);
 
-//    } else {
-//        if(msg != "") {
-//            dealMessageTime(time);
 
-//            QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
-//            QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
-//            dealMessage(messageW, item, msg, time, QNChatMessage::User_She);
-//        }
-//    }
+    //网络发送
+    if(Config::get()->server==nullptr){
+        qDebug()<<"bug";
+        return;
+    }
+//    QString eMsg = Encryption::encryptWords()
+
+    bool is;
+    QtConcurrent::run([=]() {
+        if(Config::get()->server->send_msg(QString::number(chats[index]->getID()),msg))
+            qDebug()<<"已发送(异步)";
+        else
+            qDebug()<<"未发送(异步)";
+    });
 }
 
-void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID, bool needTime) {
+int logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID, bool needTime) {
 
     int index = -1;
     //寻找消息发送对象
@@ -255,7 +250,7 @@ void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int c
             break;
         }
     }
-    if(index == -1) { return; }
+    if(index == -1) { return -1; }
     QString name;
     if(type == QNChatMessage::User_Me) {
         name = me->getName();
@@ -263,12 +258,15 @@ void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int c
     else if(ID == chatID) {
         name = chats[index]->getName();
     } else {
+        bool isFound = false;
         for(int i = 0; i < chats[index]->members.size(); i++) {
             if(chats[index]->members[i]->getID() == chatID) {
                 name = chats[index]->members[i]->getName();
+                isFound = true;
                 break;
             }
         }
+        if(!isFound) { return -1; }
     }
 
     bool isSending = false; // 发送中
@@ -302,6 +300,7 @@ void logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int c
         }
     }
     chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
+    return index;
 }
 
 void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime) {
@@ -443,16 +442,15 @@ void logWindow::on_pic_send_clicked()
 
     QString picPath = QFileDialog::getOpenFileName(this, tr("选择要发送的图片"), "/", tr("图片文件 (*.jpg *.png *.bmg *.jpeg)"));
 
-//    QHBoxLayout *pHboxLayout = new QHBoxLayout();
-//    MeSend *meSend = new MeSend(ui->chat_stack_widget->widget(cur_index + 2), picPath, me->getHead(), me->getName(), F_TYPE::fPic);
-//    pHboxLayout->insertStretch(0);
-//    pHboxLayout->addWidget(meSend);
-//    //m_pVboxLayout->addLayout(pHboxLayout);
-//    chat_layouts[cur_index]->addLayout(pHboxLayout);
+    if(picPath == "")
+        return;
+    else{
+        Config::get()->server->send_file("1",picPath);
+    }
 
-//    //receivePic(picPath, 123, "童雪");
 //    //通过网络发送图片(picPath路径的图片)****************************
     setPic(picPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
+
 
 
 
