@@ -1,4 +1,4 @@
-#include "encryption.h"
+﻿#include "encryption.h"
 
 std::string Encryption::encryptWords(const std::string& plaintext, const std::string& keyStr, const std::string& ivStr) {
     const int AES_KEY_LENGTH = 128;
@@ -39,37 +39,37 @@ std::string Encryption::encryptWords(const std::string& plaintext, const std::st
 std::string Encryption::decryptWords(const std::string& ciphertext, const std::string& keyStr, const std::string& ivStr) {
     const int AES_KEY_LENGTH = 128;
 
-        // 将密钥和初始化向量转换为unsigned char数组
-        unsigned char key[AES_KEY_LENGTH / 8];
-        unsigned char iv[AES_BLOCK_SIZE];
-        memcpy(key, keyStr.c_str(), AES_KEY_LENGTH / 8);
-        memcpy(iv, ivStr.c_str(), AES_BLOCK_SIZE);
+    // 将密钥和初始化向量转换为unsigned char数组
+    unsigned char key[AES_KEY_LENGTH / 8];
+    unsigned char iv[AES_BLOCK_SIZE];
+    memcpy(key, keyStr.c_str(), AES_KEY_LENGTH / 8);
+    memcpy(iv, ivStr.c_str(), AES_BLOCK_SIZE);
 
-        // 初始化AES上下文进行解密
-        EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-        EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), nullptr, key, iv);
+    // 初始化AES上下文进行解密
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), nullptr, key, iv);
 
-        // 密文转换为unsigned char数组
-        const unsigned char* ciphertextData = reinterpret_cast<const unsigned char*>(ciphertext.c_str());
+    // 密文转换为unsigned char数组
+    const unsigned char* ciphertextData = reinterpret_cast<const unsigned char*>(ciphertext.c_str());
 
-        // 解密缓冲区
-        const int bufferSize = ciphertext.size();
-        unsigned char decryptedBuffer[bufferSize];
+    // 解密缓冲区
+    const int bufferSize = ciphertext.size();
+    unsigned char decryptedBuffer[bufferSize];
 
-        int decryptedLength;
-        // 解密数据
-        EVP_DecryptUpdate(ctx, decryptedBuffer, &decryptedLength, ciphertextData, bufferSize);
+    int decryptedLength;
+    // 解密数据
+    EVP_DecryptUpdate(ctx, decryptedBuffer, &decryptedLength, ciphertextData, bufferSize);
 
-        // 完成解密
-        int finalLength;
-        EVP_DecryptFinal_ex(ctx, decryptedBuffer + decryptedLength, &finalLength);
-        decryptedLength += finalLength;
+    // 完成解密
+    int finalLength;
+    EVP_DecryptFinal_ex(ctx, decryptedBuffer + decryptedLength, &finalLength);
+    decryptedLength += finalLength;
 
-        // 清理资源
-        EVP_CIPHER_CTX_free(ctx);
+    // 清理资源
+    EVP_CIPHER_CTX_free(ctx);
 
-        // 将解密后的数据转换为std::string
-        return std::string(reinterpret_cast<char*>(decryptedBuffer), decryptedLength);
+    // 将解密后的数据转换为std::string
+    return std::string(reinterpret_cast<char*>(decryptedBuffer), decryptedLength);
 }
 
 void Encryption::encryptFileCBC(const std::string& inputFileName, const std::string& outputFileName, const std::string& keyStr, const std::string& ivStr) {

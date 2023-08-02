@@ -176,7 +176,8 @@ void logWindow::update_msg(){
 void logWindow::refresh_msg(){
     for(int i=0;i<res.count();i++){
         QString eMsg = res[i][4];
-        QString msg = QString::fromStdString(Encryption::decryptWords(eMsg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString()));
+        std::string m = Encryption::decryptWords(eMsg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString());
+        QString msg = QString::fromStdString(m);
         setMsg(msg,res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
         QString time = QString::number(QDateTime::currentDateTime().toTime_t());
         ChatServer::ChatStorage(res[i][1].toInt(), msg, ChatMsg::Word, res[i][1].toInt(), time, res[i][0]);
@@ -245,7 +246,7 @@ void logWindow::on_send_button_clicked()
     bool is;
     QtConcurrent::run([=]() {
         QString eMsg = QString::fromStdString(Encryption::encryptWords(msg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString()));
-        if(Config::get()->server->send_msg(QString::number(chats[index]->getID()),msg))
+        if(Config::get()->server->send_msg(QString::number(chats[index]->getID()),eMsg))
             qDebug()<<"已发送(异步)";
         else
             qDebug()<<"未发送(异步)";
