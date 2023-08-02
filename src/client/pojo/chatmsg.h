@@ -30,6 +30,8 @@ public:
 
     void setContent(QString content);
 
+    void setWebID(QString webID);
+
     int getID();
 
     int getChatID();
@@ -41,6 +43,8 @@ public:
     QString getTime();
 
     QString getContent();
+
+    QString getWebId();
 private:
     int _ID; //聊天ID，如果是私聊则是对方ID，如果是群则是群ID
     int _chatID; //消息发送者ID
@@ -48,6 +52,7 @@ private:
     bool _isRead; //是否已读
     QString _time; //时间戳
     QString _content;
+    QString _webID;
 };
 
 #endif // CHATMSG_H

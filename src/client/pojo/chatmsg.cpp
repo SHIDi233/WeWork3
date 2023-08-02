@@ -47,6 +47,11 @@ void ChatMsg::setContent(QString content) {
     _content = content;
 }
 
+void ChatMsg::setWebID(QString webID)
+{
+    _webID = webID;
+}
+
 int ChatMsg::getID() {
     return _ID;
 }
@@ -69,4 +74,9 @@ QString ChatMsg::getTime() {
 
 QString ChatMsg::getContent() {
     return _content;
+}
+
+QString ChatMsg::getWebId()
+{
+    return _webID;
 }

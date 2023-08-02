@@ -33,7 +33,7 @@ void ChatServer::initDatabase()
         dbDir.mkpath(".");
     }
     db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
-    QString create_sql = "create table record (recordID INTEGER PRIMARY KEY, ID int, chatID int, record text, time time, type varchar(20), isRead int DEFAULT 0)";
+    QString create_sql = "create table record (recordID INTEGER PRIMARY KEY, ID int, chatID int, record text, time time, type varchar(20), isRead int DEFAULT 0, webID varchar(20))";
     if(db.open()){
         qDebug() << create_sql;
         QSqlQuery result = db.exec(create_sql);
@@ -44,14 +44,14 @@ void ChatServer::initDatabase()
 }
 
 
-int ChatServer::ChatStorage(int ID, QString content, ChatMsg::MsgType type, int chatID, QString time)
+int ChatServer::ChatStorage(int ID, QString content, ChatMsg::MsgType type, int chatID, QString time, QString webID)
 {
     qDebug() << User::getUser()->getID();
     int recordID = 0;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(setting::getGlobalPath() + "\\storage\\" + QString::number(User::getUser()->getID()) + "\\chat_record.db");
-    QString insert_sql = QString("insert into record(ID, chatID, record, time, type) values(%1,%2,%3,%4,%5)")
-                             .arg(ID).arg(chatID).arg("\'" + content + "\'").arg("\'" + time + "\'").arg(type);
+    QString insert_sql = QString("insert into record(ID, chatID, record, time, type, webID) values(%1,%2,%3,%4,%5,%6)")
+                             .arg(ID).arg(chatID).arg("\'" + content + "\'").arg("\'" + time + "\'").arg(type).arg("\'" + webID + "\'");
     if(db.open()){
         QSqlQuery query = db.exec(insert_sql);
         recordID = query.lastInsertId().toInt();
@@ -102,6 +102,7 @@ QVector<ChatMsg *> ChatServer::getMsgs()
             temp->setTime(result.value("time").toString());
             temp->setType(result.value("type").toInt());
             temp->setIsRead(result.value("isRead").toInt());
+            temp->setWebID(result.value("webID").toString());
             result_.append(temp);
         }
     }
@@ -126,6 +127,7 @@ QVector<ChatMsg *> ChatServer::getMsgs(QString sTime, QString eTime)
             temp->setTime(result.value("time").toString());
             temp->setType(result.value("type").toInt());
             temp->setIsRead(result.value("isRead").toInt());
+            temp->setWebID(result.value("webID").toString());
             result_.append(temp);
         }
     }
