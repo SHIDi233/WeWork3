@@ -27,10 +27,12 @@ public:
     bool send_msg(QString receiver, QString text);//发信息
     bool send_file(QString receiver,QString url);//发文件
     QVector<QStringList> rece_msg();//消息推送接收
+    bool rece_file(QString fileName);
 
-    QStringList rece_peo();//消息推送接收
+    QStringList rece_peo();//好友推送接收
 
     int getID();
+    int getSID();
 
 private slots:
 //    void on_pushButton_clicked();

@@ -8,7 +8,7 @@ File_Sender::File_Sender(QString port){
 
 File_Sender::File_Sender(QString name, QString ip, QString port)
 {
-    this->moveToThread(this);
+//    this->moveToThread(this);
 
     this->name = name;
     this->name = name;
@@ -37,7 +37,7 @@ void File_Sender::run(){
     if(isIP){
         //连接服务器
     //    delete socket;
-        socket = new QTcpSocket(this);
+        QTcpSocket* socket = new QTcpSocket(this);
         socket->connectToHost(ip, port.toUShort());
         //初始化
         filesize = 0;
@@ -96,19 +96,21 @@ void File_Sender::run(){
     }
     else{
         //    delete server;
-            server = new QTcpServer(this);
+        socket = new QTcpSocket(this);
+        socket->connectToHost(ip, port.toUShort());
+        //初始化
+        filesize = 0;
+        sendsize = 0;
 
-        //    connect(server, &QTcpServer::newConnection, this, &File_Receiver::connected);
+        qDebug()<<"文件发送-连接1";
+    //    //连接成功信号
+    //    connect(socket, &QTcpSocket::connected, this, &File_Sender::send_header);
 
-            //启动服务器
-            server->listen(QHostAddress::Any,port.toUShort());
+    //    //发送完毕信号
+    //    connect(socket, &QTcpSocket::bytesWritten, this, &File_Sender::send_file);
 
-            if(server->waitForNewConnection(2000)){
-                qDebug()<<"服务端CHW连接成功";
-                qDebug()<<"文件接收-连接1";
-                //创建与客户端通信的套接字
-        //        delete msocket;
-                socket = server->nextPendingConnection();
+        if(socket->waitForConnected(2000)){
+//                socket = server->nextPendingConnection();
                 //关联读数据信号readyRead
         //        connect(msocket, &QTcpSocket::readyRead, this, &File_Receiver::read_data);
                 filesize = 0;

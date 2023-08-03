@@ -17,8 +17,10 @@ public:
 
     File_Sender(QString port);
 
+        void run();
+
 protected:
-    void run();
+//    void run();
 private:
     QTcpServer *server;
     QTcpSocket* socket;

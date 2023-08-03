@@ -14,6 +14,7 @@
 #include "widget_override/qnchatmessage.h"
 #include <QListWidgetItem>
 #include "widget_override/ChatListItem.h"
+#include "pojo/chatmsg.h"
 
 namespace Ui {
 class logWindow;
@@ -32,10 +33,10 @@ public:
     bool receiveFile(QString path, int ID, QString name);//接收文件
     bool getCall(int ID, int type);//调出电话界面，type=0表示视频电话，type=1表示语音通话
     void dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time, QNChatMessage::User_Type type, int index);
-    void dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time, QNChatMessage::User_Type type);
+    void dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time, QNChatMessage::User_Type type, int index, QNChatMessage::Chat_Type msgType=QNChatMessage::Chat_Pic);
     void dealMessageTime(QString curMsgTime, int index);
     int setMsg(QString msg, int ID, QNChatMessage::User_Type type, int chatID, bool needTime=true);
-    void setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime=true);
+    int setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime=true, QNChatMessage::Chat_Type msgType=QNChatMessage::Chat_Pic);
 protected:
     void resizeEvent(QResizeEvent *event);
 private:
@@ -81,7 +82,12 @@ private:
     QSystemTrayIcon  * systemtrayicon;  //系统托盘
 
     QVector<QStringList> res;
+    QVector<QString> downloading;
+    QVector<QString> id1;
+    QVector<QString> id2;
+    QVector<QString> wid;
 
+    QVector<QStringList> pics;
 };
 
 #endif // LOGWINDOW_H

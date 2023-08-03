@@ -13,6 +13,8 @@
 #include "server/global.h"
 #include <QtConcurrent>
 
+#include "server/file_receiver.h"
+
 
 logWindow::logWindow(chatObject *me ,QWidget *parent) :
     QWidget(parent),
@@ -27,17 +29,6 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     QPixmap headPix(QString(":/new/head/image/head_%1.png").arg(me->getHead()));
     ui->head->setScaledContents(true);
     ui->head->setPixmap(headPix);
-    //测试数据
-//    chatObject *p1 = new chatObject("童雪", 0, 123, TYPE::Person);
-//    chatObject *p2 = new chatObject("刘海明", 0, 345, TYPE::Person);
-//    chatObject *p3 = new chatObject("钱波", 0, 456, TYPE::Person);
-//    chats.push_back(p1);
-//    chats.push_back(p2);
-//    chats.push_back(p3);
-
-//    m_pVboxLayout = new QVBoxLayout();
-//    m_pVboxLayout->setSpacing(0);
-//    ui->chat_area_content->setLayout(m_pVboxLayout);
 
     connect(ui->chat_choose_button, &QPushButton::clicked, this, [=](){
         ui->stackedWidget->setCurrentIndex(0);
@@ -55,22 +46,11 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
 
 
     QVBoxLayout *fLayout = new QVBoxLayout();
-    //QSpacerItem *spacer = new QSpacerItem(232, 70);
-//    fLayout->setVerticalSpacing(0);
-//    fLayout->setHorizontalSpacing(0);
+
     fLayout->setSpacing(0);
     fLayout->setMargin(0);
     fLayout->setDirection(QBoxLayout::TopToBottom);
-//    for(int i = 0; i < 9; i++) {
-//        QPushButton *qpb = new QPushButton();
 
-//        friends.push_back(qpb);
-//        qpb->setText(QString("按钮%1").arg(i));
-//        qpb->setMinimumSize(QSize(232, 70));
-//        fLayout->addWidget(qpb);
-//        //ui->gridLayout->addWidget(qpb);
-//    }
-    //fLayout->addSpacerItem(new QSpacerItem(20, 227, QSizePolicy::Expanding));
     ui->friendsArea->widget()->setLayout(fLayout);
 
     //初始化聊天窗口
@@ -164,23 +144,109 @@ logWindow::logWindow(chatObject *me ,QWidget *parent) :
     m_pTimer_2->start(1000);
 
     init();
+
+    //下载队列
+    QtConcurrent::run([=](){
+                    while(1){
+            if(downloading.length()>0 &&id1.length()>0 &&id2.length()>0 &&wid.length()>0 && Config::get()->server->rece_file(downloading[0])){
+                qDebug()<<"1d";
+
+                qDebug()<<"2d";
+                //下载
+                File_Receiver* fr = new File_Receiver(downloading[0],"192.168.10.51",QString::number(10000+Config::get()->server->getSID()));
+                QString name = downloading[0];
+                qDebug()<<"3d";
+
+                QStringList list;
+
+                list.append(name);
+                list.append(id1[0]);
+                list.append(id2[0]);
+                list.append(wid[0]);
+
+                fr->run();
+                qDebug()<<"4d";
+                //更新
+
+
+                pics.append(list);
+
+                downloading.pop_front();
+                id1.pop_front();
+                id2.pop_front();
+                wid.pop_front();
+//                            break;
+
+            }
+            else{
+//                            downloading.pop_front();
+//                            break;
+                        }
+        }
+    });
 }
 
 void logWindow::update_msg(){
     QtConcurrent::run([=]() {
         res = Config::get()->server->rece_msg();
     });
-
 }
 
 void logWindow::refresh_msg(){
-    for(int i=0;i<res.count();i++){
-        QString eMsg = res[i][4];
-        std::string m = Encryption::decryptWords(eMsg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString());
-        QString msg = QString::fromStdString(m);
-        setMsg(msg,res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
+    for(int i=0;i<pics.length();i++){
+        if(pics[i].length()!=4){
+            i-=1;
+            continue;
+        }
+        setPic(pics[i][0], pics[i][1].toInt(), QNChatMessage::User_She,pics[i][2].toInt());
         QString time = QString::number(QDateTime::currentDateTime().toTime_t());
-        ChatServer::ChatStorage(res[i][1].toInt(), msg, ChatMsg::Word, res[i][1].toInt(), time, res[i][0]);
+        ChatServer::ChatStorage(pics[i][1].toInt(), pics[i][0], ChatMsg::Pic, pics[i][2].toInt(), time, pics[i][3]);
+        pics.pop_front();
+    }
+
+//    pics.clear();
+
+    for(int i=0;i<res.count();i++){
+
+        if(res[i][2]=="text"){//文本
+            QString eMsg = res[i][4];
+            std::string m = Encryption::decryptWords(std::string(eMsg.toLatin1()), setting::getKey().toStdString(), setting::getIv().toStdString());
+            QString msg = QString::fromStdString(m);
+            setMsg(msg,res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
+            QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+            ChatServer::ChatStorage(res[i][1].toInt(), eMsg, ChatMsg::Word, res[i][1].toInt(), time, res[i][0]);
+        }
+        else if(res[i][2]=="source"){//资源
+
+            QStringList list = res[i][4].split('.');
+//            list[list.count()-1]=list[list.count()-1].toLower();
+            if(list[list.count()-1]=="jpg" ||list[list.count()-1]=="png" ||list[list.count()-1]=="gif" ||list[list.count()-1]=="jpeg" ||list[list.count()-1]=="webp" ||list[list.count()-1]=="bmp"){
+                //图片格式
+                setMsg("[图片]"+res[i][4],res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
+                QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+//                ChatServer::ChatStorage(res[i][1].toInt(), "[图片]"+res[i][4], ChatMsg::Word, res[i][1].toInt(), time, res[i][0]);
+                downloading.append(res[i][4]);
+                id1.append(res[i][1]);
+                id2.append(res[i][1]);
+                wid.append(res[i][0]);
+
+            }
+            else if(list[list.count()-1]=="mp4" ||list[list.count()-1]=="mepg" ||list[list.count()-1]=="flv"  ||list[list.count()-1]=="avi"){
+                //视频格式
+            }
+            else if(list[list.count()-1]=="mp3" ||list[list.count()-1]=="wma" ||list[list.count()-1]=="wav" ||list[list.count()-1]=="flac"){
+                //音频格式
+            }
+            else{
+                //文件格式
+            }
+//            setPic(picPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
+//            setMsg("图片",res[i][1].toInt(),QNChatMessage::User_She,res[i][1].toInt());
+//            QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+//            ChatServer::ChatStorage(res[i][1].toInt(), eMsg, ChatMsg::Word, res[i][1].toInt(), time, res[i][0]);
+        }
+
+
     }
     res.clear();
 }
@@ -215,6 +281,12 @@ void logWindow::init() {
             else { t = QNChatMessage::User_She; }
             setMsg(m->getContent(), m->getID(), t, m->getChatID(), false);
         }
+        if(m->getType() == ChatMsg::Pic) {
+            QNChatMessage::User_Type t;
+            if(m->getChatID() == me->getID()) { t = QNChatMessage::User_Me; }
+            else { t = QNChatMessage::User_She; }
+            setPic(m->getContent(), m->getID(), t, m->getChatID(), false);
+        }
     }
 }
 
@@ -245,8 +317,9 @@ void logWindow::on_send_button_clicked()
 
     bool is;
     QtConcurrent::run([=]() {
-        QString eMsg = QString::fromStdString(Encryption::encryptWords(msg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString()));
-        if(Config::get()->server->send_msg(QString::number(chats[index]->getID()),eMsg))
+        std::string eMsg =Encryption::encryptWords(msg.toStdString(), setting::getKey().toStdString(), setting::getIv().toStdString());
+        QString qeMsg = QString::fromLatin1(eMsg.c_str());
+        if(Config::get()->server->send_msg(QString::number(chats[index]->getID()),qeMsg))
             qDebug()<<"已发送(异步)";
         else
             qDebug()<<"未发送(异步)";
@@ -316,7 +389,7 @@ int logWindow::setMsg(QString msg, int ID, QNChatMessage::User_Type type, int ch
     return index;
 }
 
-void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime) {
+int logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int chatID, bool needTime, QNChatMessage::Chat_Type msgType) {
 
     int index = -1;
     //寻找消息发送对象
@@ -326,7 +399,7 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
             break;
         }
     }
-    if(index == -1) { return; }
+    if(index == -1) { return -1; }
 
     QString name;
     if(type == QNChatMessage::User_Me) {
@@ -335,12 +408,15 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
     else if(ID == chatID) {
         name = chats[index]->getName();
     } else {
+        bool isFound = false;
         for(int i = 0; i < chats[index]->members.size(); i++) {
             if(chats[index]->members[i]->getID() == chatID) {
                 name = chats[index]->members[i]->getName();
+                isFound = true;
                 break;
             }
         }
+        if(!isFound) { return -1; }
     }
 
     bool isSending = false; // 发送中
@@ -350,10 +426,10 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
     if(isSending) {
         if(needTime) { dealMessageTime(time, index); }
 
-        QNChatMessage* messageW = new QNChatMessage(chat_lists[cur_index]->parentWidget());
-        QListWidgetItem* item = new QListWidgetItem(chat_lists[cur_index]);
+        QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
+        QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
         messageW->setName(name);
-        dealPic(messageW, item, path, time, type);
+        dealPic(messageW, item, path, time, type, index, msgType);
     } else {
         bool isOver = true;
         for(int i = chat_lists[index]->count() - 1; i > 0; i--) {
@@ -369,12 +445,14 @@ void logWindow::setPic(QString path, int ID, QNChatMessage::User_Type type, int 
             QNChatMessage* messageW = new QNChatMessage(chat_lists[index]->parentWidget());
             QListWidgetItem* item = new QListWidgetItem(chat_lists[index]);
             messageW->setName(name);
-            dealPic(messageW, item, path, time, type);
+            dealPic(messageW, item, path, time, type, index, msgType);
             messageW->setTextSuccess();
         }
     }
     chat_lists[index]->setCurrentRow(chat_lists[index]->count()-1);
+    return index;
 }
+
 
 void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QString text, QString time,  QNChatMessage::User_Type type, int index)
 {
@@ -389,17 +467,17 @@ void logWindow::dealMessage(QNChatMessage *messageW, QListWidgetItem *item, QStr
     chat_lists[index]->setItemWidget(item, messageW);
 }
 
-void logWindow::dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time,  QNChatMessage::User_Type type)
+void logWindow::dealPic(QNChatMessage *messageW, QListWidgetItem *item, QString path, QString time,  QNChatMessage::User_Type type, int index, QNChatMessage::Chat_Type msgType)
 {
     messageW->setFixedWidth(ui->chat_stack_widget->width() - 4);
-    QSize size = messageW->fontRectPic(path);
+    QSize size = messageW->fontRectPic(path, msgType);
     item->setSizeHint(size);
 
 //    item->setSizeHint(QSize(5, 100));
     messageW->setPic(path, time, size, type);
     messageW->setGeometry(0, 0, ui->chat_stack_widget->width(), ui->chat_stack_widget->height());
 //    item->setSizeHint()
-    chat_lists[cur_index]->setItemWidget(item, messageW);
+    chat_lists[index]->setItemWidget(item, messageW);
 }
 
 void logWindow::dealMessageTime(QString curMsgTime, int index)
@@ -458,18 +536,14 @@ void logWindow::on_pic_send_clicked()
     if(picPath == "")
         return;
     else{
-        Config::get()->server->send_file("1",picPath);
+        int index = setPic(picPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
+        Config::get()->server->send_file(QString::number(chats[index]->getID()),picPath);
+
+        QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+        ChatServer::ChatStorage(chats[cur_index]->getID(),picPath , ChatMsg::Pic, me->getID(), time, "0");
     }
 
 //    //通过网络发送图片(picPath路径的图片)****************************
-    setPic(picPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID());
-
-
-
-
-
-
-
 }
 
 bool logWindow::receiveMsg(QString msg, int ID, QString name) {
@@ -522,22 +596,15 @@ void logWindow::on_video_send_clicked()
 
     QString videoPath = QFileDialog::getOpenFileName(this, tr("选择要发送的视频"), "/", tr("视频文件 (*.mp4 *.avi *.rmvb *.wmv)"));
 
-    QHBoxLayout *pHboxLayout = new QHBoxLayout();
-    MeSend *meSend = new MeSend(ui->chat_stack_widget->widget(cur_index + 2), videoPath, me->getHead(), me->getName(), F_TYPE::fVideo);
-    pHboxLayout->insertStretch(0);
-    pHboxLayout->addWidget(meSend);
-    //m_pVboxLayout->addLayout(pHboxLayout);
-    chat_layouts[cur_index]->addLayout(pHboxLayout);
+    if(videoPath == "")
+        return;
+    else{
+        int index = setPic(videoPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID(), true, QNChatMessage::Chat_Video);
+        Config::get()->server->send_file(QString::number(chats[index]->getID()),videoPath);
 
-    //通过网络发送视频(videoPath路径的图片)*************************
-
-
-
-
-
-
-
-
+        QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+        ChatServer::ChatStorage(chats[cur_index]->getID(),videoPath , ChatMsg::Video, me->getID(), time, "0");
+    }
 }
 
 //接收视频
@@ -563,21 +630,17 @@ void logWindow::on_video_send_2_clicked()
 {
     if(cur_index < 0) return;
 
-    QString videoPath = QFileDialog::getOpenFileName(this, tr("选择要发送的文件"), "/");
+    QString videoPath = QFileDialog::getOpenFileName(this, tr("选择要发送的视频"), "/", tr("视频文件 (*.mp4 *.avi *.rmvb *.wmv)"));
 
-    QHBoxLayout *pHboxLayout = new QHBoxLayout();
-    MeSend *meSend = new MeSend(ui->chat_stack_widget->widget(cur_index + 2), videoPath, me->getHead(), me->getName(), F_TYPE::fFile);
-    pHboxLayout->insertStretch(0);
-    pHboxLayout->addWidget(meSend);
-    //m_pVboxLayout->addLayout(pHboxLayout);
-    chat_layouts[cur_index]->addLayout(pHboxLayout);
+    if(videoPath == "")
+        return;
+    else{
+        int index = setPic(videoPath, chats[cur_index]->getID(), QNChatMessage::User_Me, me->getID(), true, QNChatMessage::Chat_File);
+        Config::get()->server->send_file(QString::number(chats[index]->getID()),videoPath);
 
-    //通过网络发送视频(videoPath路径的图片)*************************
-
-
-
-
-
+        QString time = QString::number(QDateTime::currentDateTime().toTime_t());
+        ChatServer::ChatStorage(chats[cur_index]->getID(),videoPath , ChatMsg::File, me->getID(), time, "0");
+    }
 }
 
 //接收文件

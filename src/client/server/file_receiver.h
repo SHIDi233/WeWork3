@@ -13,11 +13,12 @@ class File_Receiver : public QThread
 public:
     File_Receiver(QString port);
     File_Receiver(QString name, QString ip, QString port);//有ip
+    void run();
 protected slots:
     void read_data();
     void connected();
 protected:
-    void run();
+
 private:
     QTcpServer *server;
     QString port;

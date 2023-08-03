@@ -140,6 +140,25 @@ bool Server::send_file(QString receiver,QString url){
                 }
                 File_Sender *fs = new File_Sender(url,"192.168.10.51","8000");
                 fs->start();
+
+                socket=new QTcpSocket;
+                socket->connectToHost(ip, port.toUShort());
+                if(socket->waitForConnected(2000)){
+                    //身份码-信息码-数据
+                    QString s = token+",5,"+receiver+","+filename;
+                    socket->write(s.toUtf8());
+                    qDebug()<<"发送";
+
+                        if(socket->waitForReadyRead(1000)){
+                            QByteArray array = socket->readAll();
+                            QString s(array);
+                            qDebug()<<"(客户端)单次通信成功";
+                            if(s=="1"){
+                                qDebug()<<"(客户端)信息发送成功";
+                                return true;
+                            }
+                        }
+                }
             }
     }
 }
@@ -197,6 +216,43 @@ int Server::getID(){
     QStringList tinf = token.split("|");
     QString acc = tinf[0];
     return acc.toInt();
+}
+
+int Server::getSID(){
+    QStringList tinf = token.split("|");
+    QString acc = tinf[1];
+    return acc.toInt();
+}
+
+bool Server::rece_file(QString fileName){
+    QTcpSocket* socket=new QTcpSocket;
+    socket->connectToHost(ip, port.toUShort());
+    if(socket->waitForConnected(2000)){
+        //身份码-信息码-数据
+        QString s = token+",12,"+fileName;
+        socket->write(s.toUtf8());
+        qDebug()<<"发送";
+
+        if(socket->waitForReadyRead(1000)){
+            QByteArray array = socket->readAll();
+            QString s(array);
+            qDebug()<<s;
+            qDebug()<<"(客户端)单次通信成功";
+
+            QStringList res = s.split(",");
+
+            int code = res[0].toInt();
+            if(code==1){
+                qDebug()<<"(客户端)拉取开始";
+                return true;
+            }
+            else{
+                qDebug()<<"(客户端)拉取失败";
+                return false;
+            }
+        }
+        qDebug()<<"(客户端)与服务器断开连接";
+    }
 }
 
 QStringList Server::rece_peo(){

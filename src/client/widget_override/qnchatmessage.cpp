@@ -144,7 +144,7 @@ QSize QNChatMessage::fontRect(QString str)
     return QSize(size.width(), hei);
 }
 
-QSize QNChatMessage::fontRectPic(QString path)
+QSize QNChatMessage::fontRectPic(QString path, QNChatMessage::Chat_Type chatType)
 {
 //    m_msg = str;
     int minHei = 30;
@@ -164,7 +164,10 @@ QSize QNChatMessage::fontRectPic(QString path)
 //    QSize size = getRealString(m_msg); // 整个的size
     m_chatType = Chat_Pic;
 
-    QPixmap pixmap(path);
+    QPixmap pixmap;
+    if(chatType==Chat_Pic) { pixmap = QPixmap(path); }
+    else if(chatType==Chat_Video) { pixmap = QPixmap(":/new/bg/image/video_icon.png"); }
+    else if(chatType==Chat_File) { pixmap = QPixmap(":/new/bg/image/file_icon.png"); }
     //让图像大小合适
     if(pixmap.width() > 150 || pixmap.height() > 150) {
         pixmap = pixmap.scaled(QSize(150, 150), Qt::KeepAspectRatio);

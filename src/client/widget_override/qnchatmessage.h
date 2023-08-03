@@ -47,7 +47,7 @@ public:
 
     QSize getRealString(QString src);
     QSize fontRect(QString str);
-    QSize fontRectPic(QString path);
+    QSize fontRectPic(QString path, Chat_Type chatType=Chat_Pic);
 
     inline QString text() {return m_msg;}
     inline QString time() {return m_time;}
